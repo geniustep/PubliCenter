@@ -37,7 +37,7 @@ export default function TemplatesPage() {
       const result = await response.json();
 
       if (response.ok && result.success) {
-        setTemplates(result.data.templates);
+        setTemplates(result.data);
       }
     } catch (error) {
       console.error('Failed to fetch templates:', error);

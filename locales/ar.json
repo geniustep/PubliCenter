@@ -100,7 +100,12 @@
     "status": {
       "draft": "مسودة",
       "published": "منشور",
-      "failed": "فشل"
+      "failed": "فشل",
+      "archived": "مؤرشف"
+    },
+    "filters": {
+      "all": "الكل",
+      "filterBy": "تصفية حسب"
     },
     "deleteConfirm": "هل أنت متأكد من حذف هذا المقال؟",
     "deleteSuccess": "تم حذف المقال بنجاح",
@@ -183,6 +188,36 @@
     "connectionError": "خطأ في الاتصال",
     "saveSuccess": "تم حفظ الإعدادات بنجاح",
     "saveError": "خطأ في حفظ الإعدادات"
+  },
+  "contact": {
+    "title": "اتصل بنا",
+    "subtitle": "لديك سؤال أو اقتراح؟ نحن هنا لمساعدتك",
+    "name": "الاسم",
+    "namePlaceholder": "أدخل اسمك الكامل",
+    "email": "البريد الإلكتروني",
+    "emailPlaceholder": "your@email.com",
+    "subject": "الموضوع",
+    "subjectPlaceholder": "ما هو موضوع رسالتك؟",
+    "message": "الرسالة",
+    "messagePlaceholder": "اكتب رسالتك هنا...",
+    "send": "إرسال الرسالة",
+    "sending": "جاري الإرسال...",
+    "success": "شكراً لتواصلك معنا! سنرد عليك قريباً",
+    "error": "حدث خطأ أثناء إرسال الرسالة",
+    "validation": {
+      "nameMin": "الاسم يجب أن يكون على الأقل حرفين",
+      "nameMax": "الاسم يجب ألا يتجاوز 100 حرف",
+      "emailInvalid": "البريد الإلكتروني غير صحيح",
+      "subjectMin": "الموضوع يجب أن يكون على الأقل 5 أحرف",
+      "subjectMax": "الموضوع يجب ألا يتجاوز 200 حرف",
+      "messageMin": "الرسالة يجب أن تكون على الأقل 10 أحرف",
+      "messageMax": "الرسالة يجب ألا تتجاوز 2000 حرف"
+    },
+    "info": {
+      "email": "info@publicenter.com",
+      "phone": "+966 50 123 4567",
+      "address": "الرياض، المملكة العربية السعودية"
+    }
   },
   "errors": {
     "notFound": "الصفحة غير موجودة",
