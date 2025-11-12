@@ -1,0 +1,65 @@
+# Environment variables
+.env
+.env.local
+.env*.local
+.env.backup.*
+
+# Credentials
+credentials.txt
+*.pem
+*.key
+
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Next.js
+.next/
+out/
+build/
+dist/
+
+# Production
+*.log
+*.pid
+*.seed
+*.pid.lock
+
+# Database
+*.sql
+*.sql.gz
+*.db
+
+# Backups
+backups/
+*.backup
+*.bak
+
+# SSL Certificates
+letsencrypt/
+*.crt
+*.csr
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml
+
+# Prisma
+prisma/migrations/
+
+# Uploads
+uploads/
+public/uploads/
+
