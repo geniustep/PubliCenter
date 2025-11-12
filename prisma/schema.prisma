@@ -1,0 +1,215 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model for authentication
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  password      String
+  role          UserRole  @default(EDITOR)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  articles      Article[]
+
+  @@map("users")
+}
+
+enum UserRole {
+  ADMIN
+  EDITOR
+  VIEWER
+}
+
+// Category model
+model Category {
+  id            Int       @id @default(autoincrement())
+  name          String
+  nameAr        String?
+  nameEn        String?
+  nameFr        String?
+  nameEs        String?
+  slug          String    @unique
+  description   String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  articles      Article[]
+
+  @@map("categories")
+}
+
+// Template model
+model Template {
+  id            Int       @id @default(autoincrement())
+  name          String
+  nameAr        String
+  nameEn        String
+  nameFr        String
+  nameEs        String
+  slug          String    @unique
+  description   String?
+  descriptionAr String?
+  descriptionEn String?
+  descriptionFr String?
+  descriptionEs String?
+  thumbnail     String?
+  layoutType    String    // 'modern-magazine', 'minimalist', etc.
+  isActive      Boolean   @default(true)
+  sortOrder     Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  articles      Article[]
+
+  @@map("templates")
+}
+
+// Article model
+model Article {
+  id                Int             @id @default(autoincrement())
+  title             String
+  content           String          @db.Text
+  excerpt           String?
+  sourceLanguage    Language        @default(AR)
+  status            ArticleStatus   @default(DRAFT)
+  publishedAt       DateTime?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  // Relations
+  authorId          String
+  author            User            @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  categoryId        Int?
+  category          Category?       @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  templateId        Int
+  template          Template        @relation(fields: [templateId], references: [id], onDelete: Restrict)
+
+  // Images
+  images            ArticleImage[]
+
+  // Translations
+  translations      Translation[]
+
+  @@index([authorId])
+  @@index([categoryId])
+  @@index([templateId])
+  @@index([status])
+  @@index([publishedAt])
+  @@map("articles")
+}
+
+enum Language {
+  AR  // Arabic
+  EN  // English
+  FR  // French
+  ES  // Spanish
+}
+
+enum ArticleStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+// Article Image model
+model ArticleImage {
+  id            Int       @id @default(autoincrement())
+  articleId     Int
+  article       Article   @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  url           String
+  alt           String?
+  caption       String?
+  width         Int?
+  height        Int?
+  fileSize      Int?      // in bytes
+  mimeType      String?
+  sortOrder     Int       @default(0)
+  createdAt     DateTime  @default(now())
+
+  @@index([articleId])
+  @@map("article_images")
+}
+
+// Translation model
+model Translation {
+  id                Int             @id @default(autoincrement())
+  articleId         Int
+  article           Article         @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  language          Language
+  title             String
+  content           String          @db.Text
+  excerpt           String?
+  slug              String
+
+  // WordPress integration
+  wordpressPostId   Int?
+  wordpressUrl      String?
+  publishedToWp     Boolean         @default(false)
+  publishedToWpAt   DateTime?
+
+  // Metadata
+  metaTitle         String?
+  metaDescription   String?
+
+  status            TranslationStatus @default(PENDING)
+  translatedAt      DateTime?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@unique([articleId, language])
+  @@index([articleId])
+  @@index([language])
+  @@index([wordpressPostId])
+  @@map("translations")
+}
+
+enum TranslationStatus {
+  PENDING
+  TRANSLATING
+  TRANSLATED
+  PUBLISHED
+  FAILED
+}
+
+// Analytics model (optional - for tracking)
+model Analytics {
+  id            Int       @id @default(autoincrement())
+  articleId     Int
+  language      Language
+
+  views         Int       @default(0)
+  shares        Int       @default(0)
+  date          DateTime  @default(now())
+
+  @@unique([articleId, language, date])
+  @@index([articleId])
+  @@index([date])
+  @@map("analytics")
+}
+
+// Cache model (for storing translation cache)
+model Cache {
+  id            String    @id @default(cuid())
+  key           String    @unique
+  value         String    @db.Text
+  expiresAt     DateTime
+  createdAt     DateTime  @default(now())
+
+  @@index([expiresAt])
+  @@map("cache")
+}

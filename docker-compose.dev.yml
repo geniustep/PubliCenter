@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database (Development)
+  postgres:
+    image: postgres:16-alpine
+    container_name: publicenter-postgres-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-publicenter}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-publicenter_dev}
+      POSTGRES_DB: ${DB_NAME:-publicenter_dev}
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-publicenter}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - publicenter-network-dev
+
+volumes:
+  postgres_data_dev:
+    driver: local
+
+networks:
+  publicenter-network-dev:
+    driver: bridge
