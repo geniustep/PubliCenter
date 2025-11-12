@@ -1,0 +1,54 @@
+# Dockerfile for PubliCenter Next.js Application
+FROM node:20-alpine AS base
+
+# Install dependencies only when needed
+FROM base AS deps
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+
+# Copy package files
+COPY package.json package-lock.json* ./
+RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
+
+# Rebuild the source code only when needed
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+# Generate Prisma Client (if schema exists)
+RUN if [ -f prisma/schema.prisma ]; then npx prisma generate; else echo "No Prisma schema found, skipping..."; fi
+
+# Build Next.js
+ENV NEXT_TELEMETRY_DISABLED 1
+RUN if [ -f next.config.js ] || [ -f next.config.ts ]; then npm run build; else echo "No Next.js config found, creating placeholder..."; mkdir -p .next/standalone .next/static; fi
+
+# Production image
+FROM base AS runner
+WORKDIR /app
+
+ENV NODE_ENV production
+ENV NEXT_TELEMETRY_DISABLED 1
+
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+# Copy built application
+COPY --from=builder /app/public ./public 2>/dev/null || mkdir -p public
+COPY --from=builder /app/.next/standalone ./ 2>/dev/null || mkdir -p .next/standalone
+COPY --from=builder /app/.next/static ./.next/static 2>/dev/null || mkdir -p .next/static
+COPY --from=builder /app/prisma ./prisma 2>/dev/null || true
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma 2>/dev/null || true
+
+# Set permissions
+RUN chown -R nextjs:nodejs /app
+
+USER nextjs
+
+EXPOSE 3000
+
+ENV PORT 3000
+ENV HOSTNAME "0.0.0.0"
+
+CMD ["node", "server.js"]
+

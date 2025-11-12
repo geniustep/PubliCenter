@@ -52,13 +52,24 @@ services:
       
       # Cache
       CACHE_TTL: ${CACHE_TTL}
-    ports:
-      - "3000:3000"
     networks:
       - app-network
+      - routy-traefik_web
     volumes:
       - ./uploads:/app/uploads
       - ./public/uploads:/app/public/uploads
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.publicenter-web.rule=Host(`publicenter.geniura.com`)"
+      - "traefik.http.routers.publicenter-web.entrypoints=web"
+      - "traefik.http.routers.publicenter-web.middlewares=https-redirect"
+      - "traefik.http.routers.publicenter-web.service=publicenter"
+      - "traefik.http.routers.publicenter.rule=Host(`publicenter.geniura.com`)"
+      - "traefik.http.routers.publicenter.entrypoints=websecure"
+      - "traefik.http.routers.publicenter.tls.certresolver=lehttp"
+      - "traefik.http.routers.publicenter.service=publicenter"
+      - "traefik.http.services.publicenter.loadbalancer.server.port=3000"
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/api/health"]
       interval: 30s
@@ -66,23 +77,7 @@ services:
       retries: 3
       start_period: 40s
 
-  nginx:
-    image: nginx:alpine
-    container_name: publicenter-nginx
-    restart: always
-    depends_on:
-      - app
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./letsencrypt:/etc/letsencrypt:ro
-      - ./nginx/conf.d:/etc/nginx/conf.d:ro
-    networks:
-      - app-network
-    command: >
-      sh -c "nginx -g 'daemon off;'"
+  # Nginx removed - using Traefik as reverse proxy instead
 
 volumes:
   postgres_data:
@@ -90,4 +85,6 @@ volumes:
 networks:
   app-network:
     driver: bridge
+  routy-traefik_web:
+    external: true
 
