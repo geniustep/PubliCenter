@@ -156,13 +156,19 @@ class WordPressClient {
    */
   async uploadMedia(file: Buffer, filename: string, mimeType: string): Promise<number> {
     try {
+      // Dynamic import to avoid build issues
+      const FormDataModule = await import('form-data');
+      const FormData = FormDataModule.default;
+
       const formData = new FormData();
-      const blob = new Blob([file], { type: mimeType });
-      formData.append('file', blob, filename);
+      formData.append('file', file, {
+        filename,
+        contentType: mimeType,
+      });
 
       const response = await this.client.post('/media', formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          ...formData.getHeaders(),
         },
       });
 

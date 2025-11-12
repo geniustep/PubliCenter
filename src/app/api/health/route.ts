@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { testConnection as testWordPress } from '@/lib/wordpress';
 
@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
  * GET /api/health
  * Health check endpoint
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   const checks = {
     database: 'unknown',
     wordpress: 'unknown',

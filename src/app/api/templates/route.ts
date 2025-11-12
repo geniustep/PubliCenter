@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { asyncHandler } from '@/lib/error-handler';
 
@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
  * GET /api/templates
  * Get all active templates
  */
-export const GET = asyncHandler(async (request: NextRequest) => {
+export const GET = asyncHandler(async () => {
   const templates = await prisma.template.findMany({
     where: {
       isActive: true,

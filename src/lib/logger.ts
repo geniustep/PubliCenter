@@ -18,9 +18,24 @@ class Logger {
   }
 
   /**
+   * Check if log level should be logged
+   */
+  private shouldLog(level: LogLevel): boolean {
+    const levels: LogLevel[] = ['debug', 'info', 'warn', 'error'];
+    const currentLevelIndex = levels.indexOf(this.logLevel);
+    const messageLevelIndex = levels.indexOf(level);
+    return messageLevelIndex >= currentLevelIndex;
+  }
+
+  /**
    * Internal log method
    */
   private log(level: LogLevel, message: string, context?: Record<string, any>): void {
+    // Filter logs based on log level
+    if (!this.shouldLog(level)) {
+      return;
+    }
+
     const entry: LogEntry = {
       level,
       message,

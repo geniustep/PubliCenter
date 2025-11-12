@@ -57,11 +57,8 @@ export function rateLimit(config: RateLimitConfig) {
     recentRequests.push(now);
     rateLimitStore.set(ip, recentRequests);
 
-    // Calculate remaining requests
-    const remaining = config.uniqueTokenPerInterval - recentRequests.length;
-
-    // Add rate limit headers to response (will be added by the API route)
-    return null; // Allow request
+    // Allow request
+    return null;
   };
 }
 

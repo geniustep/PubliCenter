@@ -16,11 +16,6 @@ const nextConfig = {
     ],
   },
 
-  // Experimental features
-  experimental: {
-    serverActions: true,
-  },
-
   // Redirects
   async redirects() {
     return [
