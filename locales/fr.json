@@ -31,19 +31,19 @@
     "articles": "Articles",
     "templates": "Modèles",
     "categories": "Catégories",
-    "analytics": "Analytiques",
+    "analytics": "Analyses",
     "settings": "Paramètres",
     "profile": "Profil",
     "logout": "Déconnexion"
   },
   "auth": {
-    "login": "Connexion",
-    "logout": "Déconnexion",
+    "login": "Se connecter",
+    "logout": "Se déconnecter",
     "register": "S'inscrire",
-    "email": "Email",
+    "email": "E-mail",
     "password": "Mot de passe",
     "confirmPassword": "Confirmer le mot de passe",
-    "forgotPassword": "Mot de passe oublié?",
+    "forgotPassword": "Mot de passe oublié ?",
     "resetPassword": "Réinitialiser le mot de passe",
     "name": "Nom",
     "rememberMe": "Se souvenir de moi",
@@ -56,7 +56,7 @@
     "title": "Publier un nouvel article",
     "articleTitle": "Titre de l'article",
     "articleContent": "Contenu de l'article",
-    "articleExcerpt": "Extrait de l'article",
+    "articleExcerpt": "Résumé de l'article",
     "sourceLanguage": "Langue source",
     "targetLanguages": "Langues cibles",
     "selectLanguages": "Sélectionner les langues",
@@ -73,7 +73,7 @@
     "saveDraft": "Enregistrer comme brouillon",
     "publishing": "Publication en cours...",
     "publishSuccess": "Article publié avec succès",
-    "publishError": "Erreur lors de la publication",
+    "publishError": "Erreur lors de la publication de l'article",
     "translating": "Traduction en cours...",
     "translationSuccess": "Traduction réussie",
     "translationError": "Erreur de traduction",
@@ -102,9 +102,9 @@
       "published": "Publié",
       "failed": "Échoué"
     },
-    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cet article?",
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cet article ?",
     "deleteSuccess": "Article supprimé avec succès",
-    "deleteError": "Erreur lors de la suppression"
+    "deleteError": "Erreur lors de la suppression de l'article"
   },
   "templates": {
     "title": "Modèles",
@@ -113,36 +113,36 @@
     "use": "Utiliser",
     "noTemplates": "Aucun modèle",
     "news": {
-      "name": "Modèle d'actualités",
-      "description": "Modèle standard pour les nouvelles et articles d'actualité"
+      "name": "Modèle Actualités",
+      "description": "Modèle standard pour les actualités et articles de presse"
     },
     "blog": {
-      "name": "Modèle de blog",
-      "description": "Modèle pour les articles personnels et les billets de blog"
+      "name": "Modèle Blog",
+      "description": "Modèle pour les articles personnels et publications de blog"
     },
     "tech": {
-      "name": "Modèle technologique",
+      "name": "Modèle Technologie",
       "description": "Modèle pour les articles techniques et de programmation"
     },
     "business": {
-      "name": "Modèle d'affaires",
+      "name": "Modèle Business",
       "description": "Modèle pour les articles commerciaux et économiques"
     },
     "sports": {
-      "name": "Modèle sportif",
-      "description": "Modèle pour les nouvelles et articles sportifs"
+      "name": "Modèle Sports",
+      "description": "Modèle pour les actualités et articles sportifs"
     },
     "entertainment": {
-      "name": "Modèle de divertissement",
-      "description": "Modèle pour les nouvelles et articles de divertissement"
+      "name": "Modèle Divertissement",
+      "description": "Modèle pour les actualités et articles de divertissement"
     },
     "health": {
-      "name": "Modèle de santé",
+      "name": "Modèle Santé",
       "description": "Modèle pour les articles de santé et médicaux"
     },
     "travel": {
-      "name": "Modèle de voyage",
-      "description": "Modèle pour les articles de voyage et de tourisme"
+      "name": "Modèle Voyage",
+      "description": "Modèle pour les articles de voyage et tourisme"
     }
   },
   "languages": {
@@ -152,11 +152,11 @@
     "es": "Espagnol"
   },
   "analytics": {
-    "title": "Analytiques",
-    "overview": "Aperçu",
-    "totalArticles": "Total d'articles",
-    "totalViews": "Total de vues",
-    "totalTranslations": "Total de traductions",
+    "title": "Analyses",
+    "overview": "Vue d'ensemble",
+    "totalArticles": "Total des articles",
+    "totalViews": "Total des vues",
+    "totalTranslations": "Total des traductions",
     "publishedToday": "Publié aujourd'hui",
     "topArticles": "Meilleurs articles",
     "recentActivity": "Activité récente",
@@ -182,14 +182,14 @@
     "connectionSuccess": "Connexion réussie",
     "connectionError": "Erreur de connexion",
     "saveSuccess": "Paramètres enregistrés avec succès",
-    "saveError": "Erreur lors de l'enregistrement"
+    "saveError": "Erreur lors de l'enregistrement des paramètres"
   },
   "errors": {
-    "notFound": "Page introuvable",
-    "serverError": "Erreur du serveur",
+    "notFound": "Page non trouvée",
+    "serverError": "Erreur serveur",
     "unauthorized": "Non autorisé",
     "forbidden": "Interdit",
-    "badRequest": "Mauvaise requête",
+    "badRequest": "Requête invalide",
     "validationError": "Erreur de validation",
     "networkError": "Erreur réseau",
     "tryAgain": "Réessayer",

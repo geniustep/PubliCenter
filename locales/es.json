@@ -14,7 +14,7 @@
     "filter": "Filtrar",
     "export": "Exportar",
     "import": "Importar",
-    "back": "Atrás",
+    "back": "Volver",
     "next": "Siguiente",
     "previous": "Anterior",
     "submit": "Enviar",
@@ -26,12 +26,12 @@
     "none": "Ninguno"
   },
   "nav": {
-    "dashboard": "Panel",
+    "dashboard": "Panel de control",
     "publish": "Publicar artículo",
     "articles": "Artículos",
     "templates": "Plantillas",
     "categories": "Categorías",
-    "analytics": "Analíticas",
+    "analytics": "Análisis",
     "settings": "Configuración",
     "profile": "Perfil",
     "logout": "Cerrar sesión"
@@ -46,7 +46,7 @@
     "forgotPassword": "¿Olvidaste tu contraseña?",
     "resetPassword": "Restablecer contraseña",
     "name": "Nombre",
-    "rememberMe": "Recuérdame",
+    "rememberMe": "Recordarme",
     "loginSuccess": "Inicio de sesión exitoso",
     "logoutSuccess": "Cierre de sesión exitoso",
     "loginError": "Error al iniciar sesión",
@@ -56,9 +56,9 @@
     "title": "Publicar nuevo artículo",
     "articleTitle": "Título del artículo",
     "articleContent": "Contenido del artículo",
-    "articleExcerpt": "Extracto del artículo",
-    "sourceLanguage": "Idioma de origen",
-    "targetLanguages": "Idiomas de destino",
+    "articleExcerpt": "Resumen del artículo",
+    "sourceLanguage": "Idioma fuente",
+    "targetLanguages": "Idiomas objetivo",
     "selectLanguages": "Seleccionar idiomas",
     "template": "Plantilla",
     "selectTemplate": "Seleccionar plantilla",
@@ -72,17 +72,17 @@
     "publishButton": "Publicar ahora",
     "saveDraft": "Guardar como borrador",
     "publishing": "Publicando...",
-    "publishSuccess": "Artículo publicado exitosamente",
+    "publishSuccess": "Artículo publicado con éxito",
     "publishError": "Error al publicar el artículo",
     "translating": "Traduciendo...",
     "translationSuccess": "Traducción exitosa",
     "translationError": "Error de traducción",
-    "requiredField": "Este campo es requerido",
+    "requiredField": "Este campo es obligatorio",
     "minLength": "Mínimo {min} caracteres",
     "maxLength": "Máximo {max} caracteres"
   },
   "articles": {
-    "title": "Administrar artículos",
+    "title": "Gestionar artículos",
     "myArticles": "Mis artículos",
     "allArticles": "Todos los artículos",
     "drafts": "Borradores",
@@ -92,7 +92,7 @@
     "createFirst": "Crea tu primer artículo",
     "articleDetails": "Detalles del artículo",
     "translations": "Traducciones",
-    "views": "Vistas",
+    "views": "Visualizaciones",
     "publishedAt": "Publicado el",
     "createdAt": "Creado el",
     "updatedAt": "Actualizado el",
@@ -103,7 +103,7 @@
       "failed": "Fallido"
     },
     "deleteConfirm": "¿Estás seguro de que quieres eliminar este artículo?",
-    "deleteSuccess": "Artículo eliminado exitosamente",
+    "deleteSuccess": "Artículo eliminado con éxito",
     "deleteError": "Error al eliminar el artículo"
   },
   "templates": {
@@ -113,35 +113,35 @@
     "use": "Usar",
     "noTemplates": "No hay plantillas",
     "news": {
-      "name": "Plantilla de noticias",
-      "description": "Plantilla estándar para noticias y artículos de noticias"
+      "name": "Plantilla de Noticias",
+      "description": "Plantilla estándar para noticias y artículos de prensa"
     },
     "blog": {
-      "name": "Plantilla de blog",
+      "name": "Plantilla de Blog",
       "description": "Plantilla para artículos personales y publicaciones de blog"
     },
     "tech": {
-      "name": "Plantilla de tecnología",
+      "name": "Plantilla de Tecnología",
       "description": "Plantilla para artículos técnicos y de programación"
     },
     "business": {
-      "name": "Plantilla de negocios",
+      "name": "Plantilla de Negocios",
       "description": "Plantilla para artículos comerciales y económicos"
     },
     "sports": {
-      "name": "Plantilla de deportes",
+      "name": "Plantilla de Deportes",
       "description": "Plantilla para noticias y artículos deportivos"
     },
     "entertainment": {
-      "name": "Plantilla de entretenimiento",
+      "name": "Plantilla de Entretenimiento",
       "description": "Plantilla para noticias y artículos de entretenimiento"
     },
     "health": {
-      "name": "Plantilla de salud",
+      "name": "Plantilla de Salud",
       "description": "Plantilla para artículos de salud y médicos"
     },
     "travel": {
-      "name": "Plantilla de viajes",
+      "name": "Plantilla de Viajes",
       "description": "Plantilla para artículos de viajes y turismo"
     }
   },
@@ -152,16 +152,16 @@
     "es": "Español"
   },
   "analytics": {
-    "title": "Analíticas",
+    "title": "Análisis",
     "overview": "Resumen",
     "totalArticles": "Total de artículos",
-    "totalViews": "Total de vistas",
+    "totalViews": "Total de visualizaciones",
     "totalTranslations": "Total de traducciones",
     "publishedToday": "Publicado hoy",
     "topArticles": "Mejores artículos",
     "recentActivity": "Actividad reciente",
-    "viewsByLanguage": "Vistas por idioma",
-    "viewsByCategory": "Vistas por categoría"
+    "viewsByLanguage": "Visualizaciones por idioma",
+    "viewsByCategory": "Visualizaciones por categoría"
   },
   "settings": {
     "title": "Configuración",
@@ -181,7 +181,7 @@
     "testConnection": "Probar conexión",
     "connectionSuccess": "Conexión exitosa",
     "connectionError": "Error de conexión",
-    "saveSuccess": "Configuración guardada exitosamente",
+    "saveSuccess": "Configuración guardada con éxito",
     "saveError": "Error al guardar la configuración"
   },
   "errors": {
