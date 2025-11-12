@@ -50,8 +50,27 @@ const config: Config = {
         sm: 'calc(var(--radius) - 4px)',
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        arabic: ['IBM Plex Sans Arabic', 'sans-serif'],
+        sans: [
+          'system-ui',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          'Segoe UI',
+          'Roboto',
+          'Helvetica Neue',
+          'Arial',
+          'Noto Sans',
+          'sans-serif',
+          'Apple Color Emoji',
+          'Segoe UI Emoji',
+          'Segoe UI Symbol',
+          'Noto Color Emoji',
+        ],
+        arabic: [
+          'Segoe UI',
+          'Tahoma',
+          'Arial',
+          'sans-serif',
+        ],
       },
       keyframes: {
         'accordion-down': {

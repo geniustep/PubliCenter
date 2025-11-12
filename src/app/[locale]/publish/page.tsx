@@ -21,6 +21,7 @@ import { Badge } from '@/components/ui/badge';
 import { Spinner } from '@/components/ui/spinner';
 import { useToast } from '@/hooks/use-toast';
 import { i18n } from '@/i18n-config';
+import { RichTextEditor } from '@/components/editor/rich-text-editor';
 
 export default function PublishPage() {
   const t = useTranslations();
@@ -166,18 +167,15 @@ export default function PublishPage() {
                     <Label htmlFor="content">
                       {t('publish.articleContent')} *
                     </Label>
-                    <Textarea
-                      id="content"
-                      value={formData.content}
-                      onChange={(e) =>
+                    <RichTextEditor
+                      content={formData.content}
+                      onChange={(content) =>
                         setFormData((prev) => ({
                           ...prev,
-                          content: e.target.value,
+                          content,
                         }))
                       }
                       placeholder={t('publish.articleContent')}
-                      rows={10}
-                      required
                     />
                   </div>
 
