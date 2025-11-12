@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { translateText, type SupportedLanguage } from '@/lib/translator';
-import { createWordPressClient } from '@/lib/wordpress';
 import { publishRateLimit } from '@/lib/rate-limiter';
 import { asyncHandler, ValidationError, NotFoundError } from '@/lib/error-handler';
 import { sanitizeHtml } from '@/lib/sanitize';
 import { logger } from '@/lib/logger';
+
+// Dynamic import to avoid build-time issues with form-data
+const getWordPressClient = async () => {
+  const { createWordPressClient } = await import('@/lib/wordpress');
+  return createWordPressClient();
+};
 
 export const dynamic = 'force-dynamic';
 
@@ -103,7 +108,7 @@ export const POST = asyncHandler(async (request: NextRequest) => {
 
   // Translate and publish to each target language
   const translations = [];
-  const wpClient = createWordPressClient();
+  const wpClient = await getWordPressClient();
 
   for (const targetLang of body.targetLanguages) {
     try {

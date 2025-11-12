@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { testConnection as testWordPress } from '@/lib/wordpress';
+
+// Dynamic import to avoid build-time issues with form-data
+const testWordPress = async () => {
+  const { testConnection } = await import('@/lib/wordpress');
+  return testConnection();
+};
 
 export const dynamic = 'force-dynamic';
 
