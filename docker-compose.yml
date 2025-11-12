@@ -48,6 +48,8 @@ services:
     volumes:
       - ./uploads:/app/uploads
       - ./public/uploads:/app/public/uploads
+    ports:
+      - "3000:3000"
     networks:
       - publicenter-network
       - routy-traefik_web

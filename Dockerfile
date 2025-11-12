@@ -48,6 +48,10 @@ COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
+# Copy i18n config and locales
+COPY --from=builder --chown=nextjs:nodejs /app/i18n.ts ./i18n.ts
+COPY --from=builder --chown=nextjs:nodejs /app/locales ./locales
+
 USER nextjs
 
 EXPOSE 3000
