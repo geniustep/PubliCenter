@@ -1,0 +1,198 @@
+{
+  "common": {
+    "appName": "PubliCenter",
+    "welcome": "Bienvenido",
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "export": "Exportar",
+    "import": "Importar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "submit": "Enviar",
+    "confirm": "Confirmar",
+    "close": "Cerrar",
+    "yes": "Sí",
+    "no": "No",
+    "all": "Todo",
+    "none": "Ninguno"
+  },
+  "nav": {
+    "dashboard": "Panel",
+    "publish": "Publicar artículo",
+    "articles": "Artículos",
+    "templates": "Plantillas",
+    "categories": "Categorías",
+    "analytics": "Analíticas",
+    "settings": "Configuración",
+    "profile": "Perfil",
+    "logout": "Cerrar sesión"
+  },
+  "auth": {
+    "login": "Iniciar sesión",
+    "logout": "Cerrar sesión",
+    "register": "Registrarse",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "resetPassword": "Restablecer contraseña",
+    "name": "Nombre",
+    "rememberMe": "Recuérdame",
+    "loginSuccess": "Inicio de sesión exitoso",
+    "logoutSuccess": "Cierre de sesión exitoso",
+    "loginError": "Error al iniciar sesión",
+    "invalidCredentials": "Credenciales inválidas"
+  },
+  "publish": {
+    "title": "Publicar nuevo artículo",
+    "articleTitle": "Título del artículo",
+    "articleContent": "Contenido del artículo",
+    "articleExcerpt": "Extracto del artículo",
+    "sourceLanguage": "Idioma de origen",
+    "targetLanguages": "Idiomas de destino",
+    "selectLanguages": "Seleccionar idiomas",
+    "template": "Plantilla",
+    "selectTemplate": "Seleccionar plantilla",
+    "category": "Categoría",
+    "selectCategory": "Seleccionar categoría",
+    "images": "Imágenes",
+    "addImage": "Agregar imagen",
+    "imageUrl": "URL de la imagen",
+    "imageAlt": "Texto alternativo",
+    "imageCaption": "Leyenda de la imagen",
+    "publishButton": "Publicar ahora",
+    "saveDraft": "Guardar como borrador",
+    "publishing": "Publicando...",
+    "publishSuccess": "Artículo publicado exitosamente",
+    "publishError": "Error al publicar el artículo",
+    "translating": "Traduciendo...",
+    "translationSuccess": "Traducción exitosa",
+    "translationError": "Error de traducción",
+    "requiredField": "Este campo es requerido",
+    "minLength": "Mínimo {min} caracteres",
+    "maxLength": "Máximo {max} caracteres"
+  },
+  "articles": {
+    "title": "Administrar artículos",
+    "myArticles": "Mis artículos",
+    "allArticles": "Todos los artículos",
+    "drafts": "Borradores",
+    "published": "Publicados",
+    "failed": "Fallidos",
+    "noArticles": "No hay artículos",
+    "createFirst": "Crea tu primer artículo",
+    "articleDetails": "Detalles del artículo",
+    "translations": "Traducciones",
+    "views": "Vistas",
+    "publishedAt": "Publicado el",
+    "createdAt": "Creado el",
+    "updatedAt": "Actualizado el",
+    "author": "Autor",
+    "status": {
+      "draft": "Borrador",
+      "published": "Publicado",
+      "failed": "Fallido"
+    },
+    "deleteConfirm": "¿Estás seguro de que quieres eliminar este artículo?",
+    "deleteSuccess": "Artículo eliminado exitosamente",
+    "deleteError": "Error al eliminar el artículo"
+  },
+  "templates": {
+    "title": "Plantillas",
+    "selectTemplate": "Seleccionar plantilla",
+    "preview": "Vista previa",
+    "use": "Usar",
+    "noTemplates": "No hay plantillas",
+    "news": {
+      "name": "Plantilla de noticias",
+      "description": "Plantilla estándar para noticias y artículos de noticias"
+    },
+    "blog": {
+      "name": "Plantilla de blog",
+      "description": "Plantilla para artículos personales y publicaciones de blog"
+    },
+    "tech": {
+      "name": "Plantilla de tecnología",
+      "description": "Plantilla para artículos técnicos y de programación"
+    },
+    "business": {
+      "name": "Plantilla de negocios",
+      "description": "Plantilla para artículos comerciales y económicos"
+    },
+    "sports": {
+      "name": "Plantilla de deportes",
+      "description": "Plantilla para noticias y artículos deportivos"
+    },
+    "entertainment": {
+      "name": "Plantilla de entretenimiento",
+      "description": "Plantilla para noticias y artículos de entretenimiento"
+    },
+    "health": {
+      "name": "Plantilla de salud",
+      "description": "Plantilla para artículos de salud y médicos"
+    },
+    "travel": {
+      "name": "Plantilla de viajes",
+      "description": "Plantilla para artículos de viajes y turismo"
+    }
+  },
+  "languages": {
+    "ar": "Árabe",
+    "en": "Inglés",
+    "fr": "Francés",
+    "es": "Español"
+  },
+  "analytics": {
+    "title": "Analíticas",
+    "overview": "Resumen",
+    "totalArticles": "Total de artículos",
+    "totalViews": "Total de vistas",
+    "totalTranslations": "Total de traducciones",
+    "publishedToday": "Publicado hoy",
+    "topArticles": "Mejores artículos",
+    "recentActivity": "Actividad reciente",
+    "viewsByLanguage": "Vistas por idioma",
+    "viewsByCategory": "Vistas por categoría"
+  },
+  "settings": {
+    "title": "Configuración",
+    "general": "General",
+    "account": "Cuenta",
+    "wordpress": "WordPress",
+    "translator": "Traductor",
+    "language": "Idioma",
+    "theme": "Tema",
+    "light": "Claro",
+    "dark": "Oscuro",
+    "system": "Sistema",
+    "wordpressUrl": "URL de WordPress",
+    "wordpressUsername": "Nombre de usuario",
+    "wordpressPassword": "Contraseña",
+    "googleTranslateKey": "Clave de Google Translate",
+    "testConnection": "Probar conexión",
+    "connectionSuccess": "Conexión exitosa",
+    "connectionError": "Error de conexión",
+    "saveSuccess": "Configuración guardada exitosamente",
+    "saveError": "Error al guardar la configuración"
+  },
+  "errors": {
+    "notFound": "Página no encontrada",
+    "serverError": "Error del servidor",
+    "unauthorized": "No autorizado",
+    "forbidden": "Prohibido",
+    "badRequest": "Solicitud incorrecta",
+    "validationError": "Error de validación",
+    "networkError": "Error de red",
+    "tryAgain": "Intentar de nuevo",
+    "goHome": "Volver al inicio"
+  }
+}

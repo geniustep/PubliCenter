@@ -1,0 +1,198 @@
+{
+  "common": {
+    "appName": "PubliCenter",
+    "welcome": "Bienvenue",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "create": "Créer",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "export": "Exporter",
+    "import": "Importer",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "submit": "Soumettre",
+    "confirm": "Confirmer",
+    "close": "Fermer",
+    "yes": "Oui",
+    "no": "Non",
+    "all": "Tout",
+    "none": "Aucun"
+  },
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "publish": "Publier un article",
+    "articles": "Articles",
+    "templates": "Modèles",
+    "categories": "Catégories",
+    "analytics": "Analytiques",
+    "settings": "Paramètres",
+    "profile": "Profil",
+    "logout": "Déconnexion"
+  },
+  "auth": {
+    "login": "Connexion",
+    "logout": "Déconnexion",
+    "register": "S'inscrire",
+    "email": "Email",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "forgotPassword": "Mot de passe oublié?",
+    "resetPassword": "Réinitialiser le mot de passe",
+    "name": "Nom",
+    "rememberMe": "Se souvenir de moi",
+    "loginSuccess": "Connexion réussie",
+    "logoutSuccess": "Déconnexion réussie",
+    "loginError": "Erreur de connexion",
+    "invalidCredentials": "Identifiants invalides"
+  },
+  "publish": {
+    "title": "Publier un nouvel article",
+    "articleTitle": "Titre de l'article",
+    "articleContent": "Contenu de l'article",
+    "articleExcerpt": "Extrait de l'article",
+    "sourceLanguage": "Langue source",
+    "targetLanguages": "Langues cibles",
+    "selectLanguages": "Sélectionner les langues",
+    "template": "Modèle",
+    "selectTemplate": "Sélectionner un modèle",
+    "category": "Catégorie",
+    "selectCategory": "Sélectionner une catégorie",
+    "images": "Images",
+    "addImage": "Ajouter une image",
+    "imageUrl": "URL de l'image",
+    "imageAlt": "Texte alternatif",
+    "imageCaption": "Légende de l'image",
+    "publishButton": "Publier maintenant",
+    "saveDraft": "Enregistrer comme brouillon",
+    "publishing": "Publication en cours...",
+    "publishSuccess": "Article publié avec succès",
+    "publishError": "Erreur lors de la publication",
+    "translating": "Traduction en cours...",
+    "translationSuccess": "Traduction réussie",
+    "translationError": "Erreur de traduction",
+    "requiredField": "Ce champ est requis",
+    "minLength": "Minimum {min} caractères",
+    "maxLength": "Maximum {max} caractères"
+  },
+  "articles": {
+    "title": "Gérer les articles",
+    "myArticles": "Mes articles",
+    "allArticles": "Tous les articles",
+    "drafts": "Brouillons",
+    "published": "Publiés",
+    "failed": "Échoués",
+    "noArticles": "Aucun article",
+    "createFirst": "Créez votre premier article",
+    "articleDetails": "Détails de l'article",
+    "translations": "Traductions",
+    "views": "Vues",
+    "publishedAt": "Publié le",
+    "createdAt": "Créé le",
+    "updatedAt": "Mis à jour le",
+    "author": "Auteur",
+    "status": {
+      "draft": "Brouillon",
+      "published": "Publié",
+      "failed": "Échoué"
+    },
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cet article?",
+    "deleteSuccess": "Article supprimé avec succès",
+    "deleteError": "Erreur lors de la suppression"
+  },
+  "templates": {
+    "title": "Modèles",
+    "selectTemplate": "Sélectionner un modèle",
+    "preview": "Aperçu",
+    "use": "Utiliser",
+    "noTemplates": "Aucun modèle",
+    "news": {
+      "name": "Modèle d'actualités",
+      "description": "Modèle standard pour les nouvelles et articles d'actualité"
+    },
+    "blog": {
+      "name": "Modèle de blog",
+      "description": "Modèle pour les articles personnels et les billets de blog"
+    },
+    "tech": {
+      "name": "Modèle technologique",
+      "description": "Modèle pour les articles techniques et de programmation"
+    },
+    "business": {
+      "name": "Modèle d'affaires",
+      "description": "Modèle pour les articles commerciaux et économiques"
+    },
+    "sports": {
+      "name": "Modèle sportif",
+      "description": "Modèle pour les nouvelles et articles sportifs"
+    },
+    "entertainment": {
+      "name": "Modèle de divertissement",
+      "description": "Modèle pour les nouvelles et articles de divertissement"
+    },
+    "health": {
+      "name": "Modèle de santé",
+      "description": "Modèle pour les articles de santé et médicaux"
+    },
+    "travel": {
+      "name": "Modèle de voyage",
+      "description": "Modèle pour les articles de voyage et de tourisme"
+    }
+  },
+  "languages": {
+    "ar": "Arabe",
+    "en": "Anglais",
+    "fr": "Français",
+    "es": "Espagnol"
+  },
+  "analytics": {
+    "title": "Analytiques",
+    "overview": "Aperçu",
+    "totalArticles": "Total d'articles",
+    "totalViews": "Total de vues",
+    "totalTranslations": "Total de traductions",
+    "publishedToday": "Publié aujourd'hui",
+    "topArticles": "Meilleurs articles",
+    "recentActivity": "Activité récente",
+    "viewsByLanguage": "Vues par langue",
+    "viewsByCategory": "Vues par catégorie"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "general": "Général",
+    "account": "Compte",
+    "wordpress": "WordPress",
+    "translator": "Traducteur",
+    "language": "Langue",
+    "theme": "Thème",
+    "light": "Clair",
+    "dark": "Sombre",
+    "system": "Système",
+    "wordpressUrl": "URL WordPress",
+    "wordpressUsername": "Nom d'utilisateur",
+    "wordpressPassword": "Mot de passe",
+    "googleTranslateKey": "Clé Google Translate",
+    "testConnection": "Tester la connexion",
+    "connectionSuccess": "Connexion réussie",
+    "connectionError": "Erreur de connexion",
+    "saveSuccess": "Paramètres enregistrés avec succès",
+    "saveError": "Erreur lors de l'enregistrement"
+  },
+  "errors": {
+    "notFound": "Page introuvable",
+    "serverError": "Erreur du serveur",
+    "unauthorized": "Non autorisé",
+    "forbidden": "Interdit",
+    "badRequest": "Mauvaise requête",
+    "validationError": "Erreur de validation",
+    "networkError": "Erreur réseau",
+    "tryAgain": "Réessayer",
+    "goHome": "Retour à l'accueil"
+  }
+}

@@ -1,0 +1,198 @@
+{
+  "common": {
+    "appName": "PubliCenter",
+    "welcome": "مرحباً بك",
+    "loading": "جاري التحميل...",
+    "error": "خطأ",
+    "success": "نجاح",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "create": "إنشاء",
+    "search": "بحث",
+    "filter": "تصفية",
+    "export": "تصدير",
+    "import": "استيراد",
+    "back": "رجوع",
+    "next": "التالي",
+    "previous": "السابق",
+    "submit": "إرسال",
+    "confirm": "تأكيد",
+    "close": "إغلاق",
+    "yes": "نعم",
+    "no": "لا",
+    "all": "الكل",
+    "none": "لا شيء"
+  },
+  "nav": {
+    "dashboard": "لوحة التحكم",
+    "publish": "نشر مقال",
+    "articles": "المقالات",
+    "templates": "القوالب",
+    "categories": "التصنيفات",
+    "analytics": "التحليلات",
+    "settings": "الإعدادات",
+    "profile": "الملف الشخصي",
+    "logout": "تسجيل الخروج"
+  },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "logout": "تسجيل الخروج",
+    "register": "إنشاء حساب",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "resetPassword": "إعادة تعيين كلمة المرور",
+    "name": "الاسم",
+    "rememberMe": "تذكرني",
+    "loginSuccess": "تم تسجيل الدخول بنجاح",
+    "logoutSuccess": "تم تسجيل الخروج بنجاح",
+    "loginError": "خطأ في تسجيل الدخول",
+    "invalidCredentials": "بيانات الاعتماد غير صحيحة"
+  },
+  "publish": {
+    "title": "نشر مقال جديد",
+    "articleTitle": "عنوان المقال",
+    "articleContent": "محتوى المقال",
+    "articleExcerpt": "ملخص المقال",
+    "sourceLanguage": "اللغة المصدر",
+    "targetLanguages": "اللغات المستهدفة",
+    "selectLanguages": "اختر اللغات",
+    "template": "القالب",
+    "selectTemplate": "اختر قالب",
+    "category": "التصنيف",
+    "selectCategory": "اختر تصنيف",
+    "images": "الصور",
+    "addImage": "إضافة صورة",
+    "imageUrl": "رابط الصورة",
+    "imageAlt": "النص البديل",
+    "imageCaption": "تعليق الصورة",
+    "publishButton": "نشر الآن",
+    "saveDraft": "حفظ كمسودة",
+    "publishing": "جاري النشر...",
+    "publishSuccess": "تم نشر المقال بنجاح",
+    "publishError": "خطأ في نشر المقال",
+    "translating": "جاري الترجمة...",
+    "translationSuccess": "تمت الترجمة بنجاح",
+    "translationError": "خطأ في الترجمة",
+    "requiredField": "هذا الحقل مطلوب",
+    "minLength": "الحد الأدنى {min} حرف",
+    "maxLength": "الحد الأقصى {max} حرف"
+  },
+  "articles": {
+    "title": "إدارة المقالات",
+    "myArticles": "مقالاتي",
+    "allArticles": "جميع المقالات",
+    "drafts": "المسودات",
+    "published": "المنشورة",
+    "failed": "الفاشلة",
+    "noArticles": "لا توجد مقالات",
+    "createFirst": "أنشئ أول مقال لك",
+    "articleDetails": "تفاصيل المقال",
+    "translations": "الترجمات",
+    "views": "المشاهدات",
+    "publishedAt": "تاريخ النشر",
+    "createdAt": "تاريخ الإنشاء",
+    "updatedAt": "تاريخ التحديث",
+    "author": "المؤلف",
+    "status": {
+      "draft": "مسودة",
+      "published": "منشور",
+      "failed": "فشل"
+    },
+    "deleteConfirm": "هل أنت متأكد من حذف هذا المقال؟",
+    "deleteSuccess": "تم حذف المقال بنجاح",
+    "deleteError": "خطأ في حذف المقال"
+  },
+  "templates": {
+    "title": "القوالب",
+    "selectTemplate": "اختر قالب",
+    "preview": "معاينة",
+    "use": "استخدام",
+    "noTemplates": "لا توجد قوالب",
+    "news": {
+      "name": "قالب الأخبار",
+      "description": "قالب قياسي للأخبار والمقالات الإخبارية"
+    },
+    "blog": {
+      "name": "قالب المدونة",
+      "description": "قالب للمقالات الشخصية ومنشورات المدونة"
+    },
+    "tech": {
+      "name": "قالب التقنية",
+      "description": "قالب للمقالات التقنية والبرمجية"
+    },
+    "business": {
+      "name": "قالب الأعمال",
+      "description": "قالب للمقالات التجارية والاقتصادية"
+    },
+    "sports": {
+      "name": "قالب الرياضة",
+      "description": "قالب للأخبار والمقالات الرياضية"
+    },
+    "entertainment": {
+      "name": "قالب الترفيه",
+      "description": "قالب للأخبار والمقالات الترفيهية"
+    },
+    "health": {
+      "name": "قالب الصحة",
+      "description": "قالب للمقالات الصحية والطبية"
+    },
+    "travel": {
+      "name": "قالب السفر",
+      "description": "قالب لمقالات السفر والسياحة"
+    }
+  },
+  "languages": {
+    "ar": "العربية",
+    "en": "الإنجليزية",
+    "fr": "الفرنسية",
+    "es": "الإسبانية"
+  },
+  "analytics": {
+    "title": "التحليلات",
+    "overview": "نظرة عامة",
+    "totalArticles": "إجمالي المقالات",
+    "totalViews": "إجمالي المشاهدات",
+    "totalTranslations": "إجمالي الترجمات",
+    "publishedToday": "منشور اليوم",
+    "topArticles": "أفضل المقالات",
+    "recentActivity": "النشاط الأخير",
+    "viewsByLanguage": "المشاهدات حسب اللغة",
+    "viewsByCategory": "المشاهدات حسب التصنيف"
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "general": "عام",
+    "account": "الحساب",
+    "wordpress": "WordPress",
+    "translator": "المترجم",
+    "language": "اللغة",
+    "theme": "المظهر",
+    "light": "فاتح",
+    "dark": "داكن",
+    "system": "النظام",
+    "wordpressUrl": "رابط WordPress",
+    "wordpressUsername": "اسم المستخدم",
+    "wordpressPassword": "كلمة المرور",
+    "googleTranslateKey": "مفتاح Google Translate",
+    "testConnection": "اختبار الاتصال",
+    "connectionSuccess": "الاتصال ناجح",
+    "connectionError": "خطأ في الاتصال",
+    "saveSuccess": "تم حفظ الإعدادات بنجاح",
+    "saveError": "خطأ في حفظ الإعدادات"
+  },
+  "errors": {
+    "notFound": "الصفحة غير موجودة",
+    "serverError": "خطأ في الخادم",
+    "unauthorized": "غير مصرح",
+    "forbidden": "محظور",
+    "badRequest": "طلب غير صحيح",
+    "validationError": "خطأ في التحقق",
+    "networkError": "خطأ في الشبكة",
+    "tryAgain": "حاول مرة أخرى",
+    "goHome": "العودة للرئيسية"
+  }
+}
