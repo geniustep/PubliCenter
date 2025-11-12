@@ -152,23 +152,15 @@ class WordPressClient {
   }
 
   /**
-   * Upload media
+   * Upload media using Buffer directly (no form-data dependency)
    */
   async uploadMedia(file: Buffer, filename: string, mimeType: string): Promise<number> {
     try {
-      // Dynamic import to avoid build issues
-      const FormDataModule = await import('form-data');
-      const FormData = FormDataModule.default;
-
-      const formData = new FormData();
-      formData.append('file', file, {
-        filename,
-        contentType: mimeType,
-      });
-
-      const response = await this.client.post('/media', formData, {
+      // Use axios with Buffer directly to avoid form-data build issues
+      const response = await this.client.post('/media', file, {
         headers: {
-          ...formData.getHeaders(),
+          'Content-Type': mimeType,
+          'Content-Disposition': `attachment; filename="${filename}"`,
         },
       });
 
