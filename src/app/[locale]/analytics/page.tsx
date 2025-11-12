@@ -5,7 +5,7 @@ import { Header } from '@/components/layout/header';
 import { Sidebar } from '@/components/layout/sidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { BarChart3, TrendingUp, Globe, FileText, Eye, Clock, Languages, Calendar } from 'lucide-react';
+import { TrendingUp, Globe, FileText, Eye, Clock, Languages, Calendar } from 'lucide-react';
 
 export default function AnalyticsPage() {
   const t = useTranslations();

@@ -69,6 +69,12 @@ export default function CategoriesPage() {
 
   const handleUpdate = () => {
     // TODO: Implement API call
+    if (selectedCategory) {
+      // Update the category in the list
+      setCategories(categories.map((c) =>
+        c.id === selectedCategory.id ? { ...c, ...formData } : c
+      ));
+    }
     toast({
       title: t('common.success'),
       description: 'Category updated successfully',

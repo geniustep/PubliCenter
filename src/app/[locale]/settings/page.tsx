@@ -12,7 +12,7 @@ import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
-import { Settings2, Globe, Key, Bell, Shield } from 'lucide-react';
+import { Settings2, Globe, Key, Bell } from 'lucide-react';
 
 export default function SettingsPage() {
   const t = useTranslations();
