@@ -42,8 +42,6 @@ services:
       NODE_ENV: ${NODE_ENV:-production}
       API_RATE_LIMIT: ${API_RATE_LIMIT:-100}
       CACHE_TTL: ${CACHE_TTL:-300}
-    ports:
-      - "3000:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -52,23 +50,21 @@ services:
       - ./public/uploads:/app/public/uploads
     networks:
       - publicenter-network
+      - routy-traefik_web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.publicenter-web.rule=Host(`publicenter.geniura.com`)"
+      - "traefik.http.routers.publicenter-web.entrypoints=web"
+      - "traefik.http.routers.publicenter-web.middlewares=https-redirect"
+      - "traefik.http.routers.publicenter-web.service=publicenter"
+      - "traefik.http.routers.publicenter.rule=Host(`publicenter.geniura.com`)"
+      - "traefik.http.routers.publicenter.entrypoints=websecure"
+      - "traefik.http.routers.publicenter.tls.certresolver=lehttp"
+      - "traefik.http.routers.publicenter.service=publicenter"
+      - "traefik.http.services.publicenter.loadbalancer.server.port=3000"
 
-  # Nginx Reverse Proxy
-  nginx:
-    image: nginx:alpine
-    container_name: publicenter-nginx
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./letsencrypt:/etc/letsencrypt:ro
-      - ./public:/usr/share/nginx/html:ro
-    depends_on:
-      - app
-    networks:
-      - publicenter-network
+  # Nginx removed - using Traefik as reverse proxy instead
 
 volumes:
   postgres_data:
@@ -77,3 +73,5 @@ volumes:
 networks:
   publicenter-network:
     driver: bridge
+  routy-traefik_web:
+    external: true
