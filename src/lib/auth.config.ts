@@ -46,12 +46,14 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Invalid credentials');
         }
 
+        const role = user.role as UserRole;
+
         return {
           id: user.id,
           email: user.email,
           name: user.name,
           image: user.image,
-          role: user.role,
+          role,
         };
       },
     }),
@@ -60,8 +62,9 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user, trigger, session }) {
       // Initial sign in
       if (user) {
+        const userRole = user.role as UserRole;
         token.id = user.id;
-        token.role = user.role;
+        token.role = userRole;
         token.email = user.email;
       }
 

@@ -1,6 +1,6 @@
 import createMiddleware from 'next-intl/middleware';
 import { withAuth } from 'next-auth/middleware';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { i18n } from './i18n-config';
 
 // Paths that require authentication
