@@ -123,44 +123,185 @@ export class WordPressPluginDetector {
   /**
    * Detect Polylang
    * API: Check for polylang parameter support in posts
+   * Enhanced detection with multiple methods
    */
   private async detectPolylang(): Promise<PluginDetectionResult | null> {
     try {
-      // Polylang adds 'lang' parameter to REST API
-      const response = await this.client.get('/wp/v2/posts', {
-        params: { per_page: 1, lang: 'all' },
-      });
+      logger.debug('Attempting Polylang detection', { siteUrl: this.siteUrl });
 
-      // Check if response headers contain polylang info
-      if (response.headers['x-polylang-version'] || response.config.params?.lang === 'all') {
-        // Get languages from Polylang
-        let languages: string[] = [];
-        try {
-          const langResponse = await this.client.get('/wp/v2/languages');
-          if (langResponse.data && Array.isArray(langResponse.data)) {
-            languages = langResponse.data.map((lang: any) => lang.slug || lang.locale);
+      // Method 1: Check installed plugins list
+      try {
+        const pluginsResponse = await this.client.get('/wp/v2/plugins');
+        if (pluginsResponse.data && Array.isArray(pluginsResponse.data)) {
+          const polylangPlugin = pluginsResponse.data.find((plugin: any) =>
+            plugin.plugin?.includes('polylang') ||
+            plugin.name?.toLowerCase().includes('polylang') ||
+            plugin.textdomain === 'polylang'
+          );
+
+          if (polylangPlugin && polylangPlugin.status === 'active') {
+            logger.info('Polylang detected via plugins list', {
+              siteUrl: this.siteUrl,
+              version: polylangPlugin.version
+            });
+
+            const languages = await this.getPolylangLanguages();
+            return {
+              plugin: TranslationPlugin.POLYLANG,
+              version: polylangPlugin.version || null,
+              supportedLanguages: languages,
+              settings: {
+                languageParameter: 'lang',
+                detectionMethod: 'plugins-api',
+              },
+            };
           }
-        } catch {
-          // Fallback: extract from post data
-          languages = this.extractLanguagesFromPosts(response.data);
         }
-
-        logger.info('Polylang detected', { siteUrl: this.siteUrl, languages });
-
-        return {
-          plugin: TranslationPlugin.POLYLANG,
-          version: response.headers['x-polylang-version'] || null,
-          supportedLanguages: languages,
-          settings: {
-            languageParameter: 'lang',
-          },
-        };
+      } catch (error) {
+        logger.debug('Plugins API check failed', { error });
       }
+
+      // Method 2: Check for language taxonomy
+      try {
+        const taxonomiesResponse = await this.client.get('/wp/v2/taxonomies');
+        if (taxonomiesResponse.data &&
+            (taxonomiesResponse.data.language || taxonomiesResponse.data.term_language)) {
+          logger.info('Polylang detected via taxonomies', { siteUrl: this.siteUrl });
+
+          const languages = await this.getPolylangLanguages();
+          return {
+            plugin: TranslationPlugin.POLYLANG,
+            version: null,
+            supportedLanguages: languages,
+            settings: {
+              languageParameter: 'lang',
+              detectionMethod: 'taxonomies',
+            },
+          };
+        }
+      } catch (error) {
+        logger.debug('Taxonomies check failed', { error });
+      }
+
+      // Method 3: Check posts with lang parameter
+      try {
+        const response = await this.client.get('/wp/v2/posts', {
+          params: { per_page: 1, lang: 'all' },
+        });
+
+        // Check if response headers contain polylang info or if lang parameter was accepted
+        if (response.headers['x-polylang-version'] ||
+            response.status === 200) {
+
+          const languages = await this.getPolylangLanguages();
+
+          // If we got languages, Polylang is likely active
+          if (languages.length > 0) {
+            logger.info('Polylang detected via posts API', {
+              siteUrl: this.siteUrl,
+              languages
+            });
+
+            return {
+              plugin: TranslationPlugin.POLYLANG,
+              version: response.headers['x-polylang-version'] || null,
+              supportedLanguages: languages,
+              settings: {
+                languageParameter: 'lang',
+                detectionMethod: 'posts-api',
+              },
+            };
+          }
+        }
+      } catch (error) {
+        logger.debug('Posts API check failed', { error });
+      }
+
+      // Method 4: Check for Polylang REST API endpoints
+      try {
+        const polylangApiResponse = await this.client.get('/pll/v1/languages');
+        if (polylangApiResponse.status === 200 && polylangApiResponse.data) {
+          const languages = Array.isArray(polylangApiResponse.data)
+            ? polylangApiResponse.data.map((lang: any) => lang.slug || lang.locale)
+            : [];
+
+          logger.info('Polylang detected via Polylang API', {
+            siteUrl: this.siteUrl,
+            languages
+          });
+
+          return {
+            plugin: TranslationPlugin.POLYLANG,
+            version: polylangApiResponse.headers['x-polylang-version'] || null,
+            supportedLanguages: languages,
+            settings: {
+              languageParameter: 'lang',
+              detectionMethod: 'polylang-api',
+            },
+          };
+        }
+      } catch (error) {
+        logger.debug('Polylang API check failed', { error });
+      }
+
+      logger.debug('Polylang not detected after all methods', { siteUrl: this.siteUrl });
     } catch (error) {
-      logger.debug('Polylang not detected', { siteUrl: this.siteUrl });
+      logger.debug('Polylang detection failed', {
+        siteUrl: this.siteUrl,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
     }
 
     return null;
+  }
+
+  /**
+   * Get languages configured in Polylang
+   */
+  private async getPolylangLanguages(): Promise<string[]> {
+    const languages: string[] = [];
+
+    try {
+      // Try Polylang REST API first
+      try {
+        const langResponse = await this.client.get('/pll/v1/languages');
+        if (langResponse.data && Array.isArray(langResponse.data)) {
+          return langResponse.data.map((lang: any) => lang.slug || lang.locale);
+        }
+      } catch {}
+
+      // Try WordPress languages endpoint
+      try {
+        const langResponse = await this.client.get('/wp/v2/languages');
+        if (langResponse.data && Array.isArray(langResponse.data)) {
+          return langResponse.data.map((lang: any) => lang.slug || lang.locale);
+        }
+      } catch {}
+
+      // Try getting from language taxonomy terms
+      try {
+        const termsResponse = await this.client.get('/wp/v2/language', {
+          params: { per_page: 100 }
+        });
+        if (termsResponse.data && Array.isArray(termsResponse.data)) {
+          return termsResponse.data.map((term: any) => term.slug);
+        }
+      } catch {}
+
+      // Fallback: extract from posts
+      try {
+        const postsResponse = await this.client.get('/wp/v2/posts', {
+          params: { per_page: 10, lang: 'all' }
+        });
+        if (postsResponse.data && Array.isArray(postsResponse.data)) {
+          return this.extractLanguagesFromPosts(postsResponse.data);
+        }
+      } catch {}
+    } catch (error) {
+      logger.debug('Failed to get Polylang languages', { error });
+    }
+
+    return languages;
   }
 
   /**

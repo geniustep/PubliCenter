@@ -142,8 +142,12 @@ export function useDeleteWordPressSite() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (id: number) => {
-      const response = await fetch(`/api/wordpress-sites/${id}`, {
+    mutationFn: async ({ id, force = false }: { id: number; force?: boolean }) => {
+      const url = force
+        ? `/api/wordpress-sites/${id}?force=true`
+        : `/api/wordpress-sites/${id}`;
+
+      const response = await fetch(url, {
         method: 'DELETE',
         credentials: 'include', // Include cookies for authentication
       });

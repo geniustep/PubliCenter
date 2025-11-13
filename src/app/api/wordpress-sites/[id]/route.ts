@@ -171,9 +171,12 @@ export const PUT = asyncHandler(
 /**
  * DELETE /api/wordpress-sites/[id]
  * Delete a WordPress site
+ *
+ * Query parameters:
+ * - force=true: حذف الموقع مع جميع التبعيات (التصنيفات والمقالات المنشورة)
  */
 export const DELETE = asyncHandler(
-  async (_request: NextRequest, { params }: { params: { id: string } }) => {
+  async (request: NextRequest, { params }: { params: { id: string } }) => {
     const session = await getServerSession(authOptions);
 
     if (!session?.user) {
@@ -202,12 +205,24 @@ export const DELETE = asyncHandler(
 
     const siteId = parseInt(params.id);
 
+    // Check for force delete parameter
+    const { searchParams } = new URL(request.url);
+    const forceDelete = searchParams.get('force') === 'true';
+
     // Check if site exists
     const site = await prisma.wordPressSite.findUnique({
       where: { id: siteId },
       include: {
         _count: {
           select: { translations: true },
+        },
+        translations: {
+          select: {
+            id: true,
+            title: true,
+            language: true,
+            articleId: true,
+          },
         },
       },
     });
@@ -223,20 +238,68 @@ export const DELETE = asyncHandler(
     console.log('🔍 [DELETE /api/wordpress-sites/[id]] Checking translations:', {
       siteId,
       translationsCount: site._count.translations,
+      forceDelete,
     });
 
-    if (site._count.translations > 0) {
+    if (site._count.translations > 0 && !forceDelete) {
       console.log('❌ [DELETE /api/wordpress-sites/[id]] Cannot delete - has translations');
       return NextResponse.json(
         {
           success: false,
           error: 'Cannot delete site with existing translations',
-          details: `This site has ${site._count.translations} translations. Please remove them first.`,
+          details: `This site has ${site._count.translations} translations. Use force=true to delete the site and unlink all translations.`,
+          translationsCount: site._count.translations,
         },
         { status: 400 }
       );
     }
 
+    let deletedTranslations = 0;
+    let unlinkedTranslations = 0;
+
+    // If force delete, handle translations
+    if (forceDelete && site._count.translations > 0) {
+      console.log('⚠️ [DELETE /api/wordpress-sites/[id]] Force delete - handling translations');
+
+      // Get translations details before deletion
+      const translationIds = site.translations.map((t) => t.id);
+
+      // Option 1: Unlink translations from the site (set wordPressSiteId to null)
+      // This keeps the translations but removes the association with this WordPress site
+      const updateResult = await prisma.translation.updateMany({
+        where: {
+          id: { in: translationIds },
+        },
+        data: {
+          wordPressSiteId: null,
+          wordpressPostId: null,
+          wordpressUrl: null,
+          publishedToWp: false,
+        },
+      });
+
+      unlinkedTranslations = updateResult.count;
+
+      console.log('🔗 [DELETE /api/wordpress-sites/[id]] Unlinked translations:', {
+        count: unlinkedTranslations,
+      });
+
+      // Optional: If you want to completely delete translations instead of unlinking,
+      // uncomment the following code and comment out the updateMany above:
+      /*
+      const deleteResult = await prisma.translation.deleteMany({
+        where: {
+          id: { in: translationIds },
+        },
+      });
+      deletedTranslations = deleteResult.count;
+      console.log('🗑️ [DELETE /api/wordpress-sites/[id]] Deleted translations:', {
+        count: deletedTranslations,
+      });
+      */
+    }
+
+    // Delete the WordPress site
     console.log('🗑️ [DELETE /api/wordpress-sites/[id]] Deleting site:', siteId);
     await prisma.wordPressSite.delete({
       where: { id: siteId },
@@ -247,6 +310,15 @@ export const DELETE = asyncHandler(
       success: true,
       data: {
         message: 'WordPress site deleted successfully',
+        deletedSite: {
+          id: site.id,
+          name: site.name,
+          url: site.url,
+        },
+        translationsHandled: {
+          unlinked: unlinkedTranslations,
+          deleted: deletedTranslations,
+        },
       },
     });
   }

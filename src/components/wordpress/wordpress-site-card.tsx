@@ -61,16 +61,26 @@ export function WordPressSiteCard({ site, onEdit, onSync }: WordPressSiteCardPro
   const params = useParams();
   const locale = params.locale as string;
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [forceDelete, setForceDelete] = useState(false);
   const deleteSite = useDeleteWordPressSite();
+
+  const hasTranslations = (site._count?.translations ?? 0) > 0;
 
   const handleDelete = async () => {
     try {
-      await deleteSite.mutateAsync(site.id);
+      await deleteSite.mutateAsync({ id: site.id, force: forceDelete });
       toast.success(t('wordpress.deleteSuccess'));
+      setShowDeleteDialog(false);
+      setForceDelete(false);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : t('wordpress.deleteError'));
+      const errorMessage = error instanceof Error ? error.message : t('wordpress.deleteError');
+      toast.error(errorMessage);
+
+      // If error mentions translations, keep dialog open and suggest force delete
+      if (errorMessage.includes('translations') && !forceDelete) {
+        toast.info(t('wordpress.forceDeleteHint'));
+      }
     }
-    setShowDeleteDialog(false);
   };
 
   return (
@@ -215,14 +225,52 @@ export function WordPressSiteCard({ site, onEdit, onSync }: WordPressSiteCardPro
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t('wordpress.deleteSite')}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t('wordpress.deleteConfirm')}
-              <br />
-              <strong className="text-foreground">{site.name}</strong>
+            <AlertDialogDescription asChild>
+              <div className="space-y-4">
+                <p>
+                  {t('wordpress.deleteConfirm')}
+                  <br />
+                  <strong className="text-foreground">{site.name}</strong>
+                </p>
+
+                {hasTranslations && (
+                  <>
+                    <div className="bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-md p-3">
+                      <div className="flex items-start gap-2">
+                        <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+                        <div className="text-sm text-amber-800 dark:text-amber-200">
+                          <p className="font-semibold mb-1">
+                            {t('wordpress.hasTranslations')}
+                          </p>
+                          <p>
+                            {t('wordpress.translationsWarning', {
+                              count: site._count?.translations ?? 0,
+                            })}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <label className="flex items-start gap-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={forceDelete}
+                        onChange={(e) => setForceDelete(e.target.checked)}
+                        className="mt-1 h-4 w-4 rounded border-gray-300"
+                      />
+                      <span className="text-sm text-foreground">
+                        {t('wordpress.forceDeleteOption')}
+                      </span>
+                    </label>
+                  </>
+                )}
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setForceDelete(false)}>
+              {t('common.cancel')}
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive hover:bg-destructive/90"
