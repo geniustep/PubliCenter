@@ -18,6 +18,7 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
+    username: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -31,6 +32,16 @@ export default function RegisterPage() {
       newErrors.name = t('auth.validation.nameRequired');
     } else if (formData.name.length < 2) {
       newErrors.name = t('auth.validation.nameMin');
+    }
+
+    if (!formData.username) {
+      newErrors.username = t('auth.validation.usernameRequired');
+    } else if (formData.username.length < 3) {
+      newErrors.username = t('auth.validation.usernameMin');
+    } else if (formData.username.length > 30) {
+      newErrors.username = t('auth.validation.usernameMax');
+    } else if (!/^[a-zA-Z0-9._-]+$/.test(formData.username)) {
+      newErrors.username = t('auth.validation.usernameInvalid');
     }
 
     if (!formData.email) {
@@ -85,9 +96,18 @@ export default function RegisterPage() {
         // Redirect to login page
         router.push('./login');
       } else {
+        const errorKey =
+          result?.error === 'EMAIL_TAKEN' || result?.errorCode === 'EMAIL_TAKEN'
+            ? 'auth.emailTaken'
+            : result?.error === 'USERNAME_TAKEN' || result?.errorCode === 'USERNAME_TAKEN'
+              ? 'auth.usernameTaken'
+              : null;
+
+        const description = errorKey ? t(errorKey) : result?.error || t('auth.registerError');
+
         toast({
           title: t('common.error'),
-          description: result.error || t('auth.registerError'),
+          description,
           variant: 'destructive',
         });
       }
@@ -135,6 +155,23 @@ export default function RegisterPage() {
               />
               {errors.name && (
                 <p className="text-sm text-destructive">{errors.name}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="username">{t('auth.username')}</Label>
+              <Input
+                id="username"
+                name="username"
+                type="text"
+                placeholder={t('auth.usernamePlaceholder')}
+                value={formData.username}
+                onChange={handleChange}
+                className={errors.username ? 'border-destructive' : ''}
+                disabled={isLoading}
+              />
+              {errors.username && (
+                <p className="text-sm text-destructive">{errors.username}</p>
               )}
             </div>
 

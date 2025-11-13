@@ -20,16 +20,24 @@ export const authOptions: NextAuthOptions = {
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
-        email: { label: 'Email', type: 'email' },
+        identifier: { label: 'Email or Username', type: 'text' },
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
+        const identifier = credentials?.identifier?.trim();
+        const password = credentials?.password;
+
+        if (!identifier || !password) {
           throw new Error('Invalid credentials');
         }
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
+        const user = await prisma.user.findFirst({
+          where: {
+            OR: [
+              { email: { equals: identifier, mode: 'insensitive' } },
+              { username: { equals: identifier, mode: 'insensitive' } },
+            ],
+          },
         });
 
         if (!user || !user.password) {
@@ -40,13 +48,13 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Account is deactivated');
         }
 
-        const isPasswordValid = await compare(credentials.password, user.password);
+        const isPasswordValid = await compare(password, user.password);
 
         if (!isPasswordValid) {
           throw new Error('Invalid credentials');
         }
 
-        const role = user.role as UserRole;
+        const role = (user.role ?? UserRole.AUTHOR) as UserRole;
 
         return {
           id: user.id,
@@ -54,6 +62,7 @@ export const authOptions: NextAuthOptions = {
           name: user.name,
           image: user.image,
           role,
+          username: user.username ?? null,
         };
       },
     }),
@@ -66,6 +75,11 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
         token.role = userRole;
         token.email = user.email;
+        if ('username' in user) {
+          token.username = ((user as any).username as string | null) ?? null;
+        } else {
+          token.username = null;
+        }
       }
 
       // Update session
@@ -81,6 +95,7 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id as string;
         session.user.role = token.role as UserRole;
         session.user.email = token.email as string;
+        session.user.username = (token.username as string | undefined) ?? null;
       }
 
       return session;

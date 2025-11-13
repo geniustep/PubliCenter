@@ -63,6 +63,7 @@ export enum UserRole {
 export interface User {
   id: string;
   name: string | null;
+  username: string | null;
   email: string;
   emailVerified: string | null;
   image: string | null;
@@ -211,12 +212,13 @@ export interface ContactFormRequest {
 
 // Authentication Types
 export interface LoginRequest {
-  email: string;
+  identifier: string;
   password: string;
 }
 
 export interface RegisterRequest {
   name: string;
+  username: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -226,6 +228,7 @@ export interface AuthSession {
   user: {
     id: string;
     name: string | null;
+    username: string | null;
     email: string;
     image: string | null;
     role: UserRole;

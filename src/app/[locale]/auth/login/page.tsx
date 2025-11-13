@@ -19,7 +19,7 @@ export default function LoginPage() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    email: '',
+    identifier: '',
     password: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -29,10 +29,8 @@ export default function LoginPage() {
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.email) {
-      newErrors.email = t('auth.validation.emailRequired');
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = t('auth.validation.emailInvalid');
+    if (!formData.identifier) {
+      newErrors.identifier = t('auth.validation.identifierRequired');
     }
 
     if (!formData.password) {
@@ -54,7 +52,7 @@ export default function LoginPage() {
 
     try {
       const result = await signIn('credentials', {
-        email: formData.email,
+        identifier: formData.identifier,
         password: formData.password,
         redirect: false,
       });
@@ -106,19 +104,19 @@ export default function LoginPage() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">{t('auth.email')}</Label>
+              <Label htmlFor="identifier">{t('auth.identifier')}</Label>
               <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder={t('auth.emailPlaceholder')}
-                value={formData.email}
+                id="identifier"
+                name="identifier"
+                type="text"
+                placeholder={t('auth.identifierPlaceholder')}
+                value={formData.identifier}
                 onChange={handleChange}
-                className={errors.email ? 'border-destructive' : ''}
+                className={errors.identifier ? 'border-destructive' : ''}
                 disabled={isLoading}
               />
-              {errors.email && (
-                <p className="text-sm text-destructive">{errors.email}</p>
+              {errors.identifier && (
+                <p className="text-sm text-destructive">{errors.identifier}</p>
               )}
             </div>
 
