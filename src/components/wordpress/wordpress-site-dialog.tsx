@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
+import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -45,6 +46,7 @@ interface WordPressSiteDialogProps {
 
 export function WordPressSiteDialog({ open, onOpenChange, site }: WordPressSiteDialogProps) {
   const t = useTranslations();
+  const { data: session, status } = useSession();
   const isEdit = !!site;
   const createSite = useCreateWordPressSite();
   const updateSite = useUpdateWordPressSite();
@@ -57,7 +59,7 @@ export function WordPressSiteDialog({ open, onOpenChange, site }: WordPressSiteD
     appPassword: isEdit
       ? z.string().optional()
       : z.string().min(1, t('wordpress.validation.appPasswordRequired')),
-    isActive: z.boolean().default(true),
+    isActive: z.boolean(),
   });
 
   type FormValues = z.infer<typeof formSchema>;
@@ -98,8 +100,27 @@ export function WordPressSiteDialog({ open, onOpenChange, site }: WordPressSiteD
   }, [site, form]);
 
   const onSubmit = async (data: FormValues) => {
+    console.log('🖱️ [Frontend] Submit button clicked');
+    console.log('🔐 [Frontend] Session status:', {
+      status,
+      isAuthenticated: !!session,
+      userId: session?.user?.id,
+      userEmail: session?.user?.email,
+      userRole: session?.user?.role,
+    });
+    console.log('📝 [Frontend] Form data:', {
+      isEdit,
+      name: data.name,
+      url: data.url,
+      language: data.language,
+      username: data.username,
+      appPassword: data.appPassword ? `[HIDDEN - Length: ${data.appPassword.length}]` : undefined,
+      isActive: data.isActive,
+    });
+
     try {
       if (isEdit && site) {
+        console.log('✏️ [Frontend] Updating existing site:', site.id);
         const updateData: any = {
           name: data.name,
           url: data.url,
@@ -116,19 +137,29 @@ export function WordPressSiteDialog({ open, onOpenChange, site }: WordPressSiteD
         await updateSite.mutateAsync({ id: site.id, data: updateData });
         toast.success(t('wordpress.updateSuccess'));
       } else {
-        await createSite.mutateAsync({
+        console.log('➕ [Frontend] Creating new WordPress site');
+        const createData = {
           name: data.name,
           url: data.url,
           language: data.language,
           username: data.username,
           appPassword: data.appPassword!,
+        };
+        
+        console.log('📤 [Frontend] Calling createSite.mutateAsync with:', {
+          ...createData,
+          appPassword: '[HIDDEN]',
         });
+
+        await createSite.mutateAsync(createData);
+        console.log('✅ [Frontend] Site created successfully');
         toast.success(t('wordpress.createSuccess'));
       }
 
       onOpenChange(false);
       form.reset();
     } catch (error) {
+      console.error('❌ [Frontend] Error in onSubmit:', error);
       toast.error(error instanceof Error ? error.message : t('wordpress.createError'));
     }
   };

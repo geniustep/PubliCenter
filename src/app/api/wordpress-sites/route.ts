@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth.config';
 import { prisma } from '@/lib/prisma';
 import { asyncHandler } from '@/lib/error-handler';
 import { z } from 'zod';
-import { hash } from 'bcryptjs';
+import { encrypt } from '@/lib/encryption';
 import { createPluginDetector } from '@/lib/wordpress-plugin-detector';
 import { hasPermission } from '@/lib/rbac';
 import { Language } from '@/types/api';
@@ -94,17 +94,46 @@ export const GET = asyncHandler(async (request: NextRequest) => {
  * Create a new WordPress site
  */
 export const POST = asyncHandler(async (request: NextRequest) => {
+  console.log('🔵 [POST /api/wordpress-sites] Request received');
+  console.log('📥 Request headers:', {
+    'content-type': request.headers.get('content-type'),
+    'user-agent': request.headers.get('user-agent'),
+    'cookie': request.headers.get('cookie') ? `[PRESENT - Length: ${request.headers.get('cookie')?.length}]` : '[MISSING]',
+  });
+
   const session = await getServerSession(authOptions);
+  console.log('🔐 [POST /api/wordpress-sites] Session check:', {
+    hasSession: !!session,
+    userId: session?.user?.id,
+    userEmail: session?.user?.email,
+    userRole: session?.user?.role,
+  });
 
   if (!session?.user) {
+    console.log('❌ [POST /api/wordpress-sites] Unauthorized - No session');
     return NextResponse.json(
       { success: false, error: 'Unauthorized' },
       { status: 401 }
     );
   }
 
+  console.log('👤 [POST /api/wordpress-sites] User:', {
+    id: session.user.id,
+    email: session.user.email,
+    role: session.user.role,
+  });
+
   // Check permissions
-  if (!hasPermission(session.user.role, 'wordpress-sites', 'create')) {
+  const hasCreatePermission = hasPermission(session.user.role, 'wordpress-sites', 'create');
+  console.log('🔐 [POST /api/wordpress-sites] Permission check:', {
+    role: session.user.role,
+    resource: 'wordpress-sites',
+    action: 'create',
+    hasPermission: hasCreatePermission,
+  });
+
+  if (!hasCreatePermission) {
+    console.log('❌ [POST /api/wordpress-sites] Forbidden - No permission');
     return NextResponse.json(
       { success: false, error: 'Forbidden' },
       { status: 403 }
@@ -112,11 +141,19 @@ export const POST = asyncHandler(async (request: NextRequest) => {
   }
 
   const body = await request.json();
+  console.log('📦 [POST /api/wordpress-sites] Request body:', {
+    name: body.name,
+    url: body.url,
+    language: body.language,
+    username: body.username,
+    appPassword: body.appPassword ? `[HIDDEN - Length: ${body.appPassword.length}]` : undefined,
+  });
 
   // Validate request body
   const validationResult = createSiteSchema.safeParse(body);
 
   if (!validationResult.success) {
+    console.log('❌ [POST /api/wordpress-sites] Validation failed:', validationResult.error.issues);
     return NextResponse.json(
       {
         success: false,
@@ -138,19 +175,28 @@ export const POST = asyncHandler(async (request: NextRequest) => {
   });
 
   if (existingSite) {
+    console.log('❌ [POST /api/wordpress-sites] Site already exists:', normalizedUrl);
     return NextResponse.json(
       { success: false, error: 'Site with this URL already exists' },
       { status: 400 }
     );
   }
 
-  // Encrypt the app password
-  const hashedPassword = await hash(appPassword, 12);
+  console.log('🔍 [POST /api/wordpress-sites] Testing connection and detecting plugin...');
+
+  // Encrypt the app password (using encryption, not hashing, so we can decrypt it later)
+  const encryptedPassword = encrypt(appPassword);
 
   try {
     // Test connection and detect plugin before saving
     const detector = createPluginDetector(normalizedUrl, username, appPassword);
     const pluginInfo = await detector.detectPlugin();
+    
+    console.log('✅ [POST /api/wordpress-sites] Plugin detected:', {
+      plugin: pluginInfo.plugin,
+      version: pluginInfo.version,
+      supportedLanguages: pluginInfo.supportedLanguages,
+    });
 
     // Create the site
     const site = await prisma.wordPressSite.create({
@@ -159,7 +205,7 @@ export const POST = asyncHandler(async (request: NextRequest) => {
         url: normalizedUrl,
         language,
         username,
-        appPassword: hashedPassword,
+        appPassword: encryptedPassword,
         translationPlugin: pluginInfo.plugin,
         pluginVersion: pluginInfo.version,
         pluginSettings: pluginInfo.settings || {},
@@ -173,24 +219,43 @@ export const POST = asyncHandler(async (request: NextRequest) => {
       },
     });
 
+    console.log('✅ [POST /api/wordpress-sites] Site created successfully:', {
+      id: site.id,
+      name: site.name,
+      url: site.url,
+      language: site.language,
+      plugin: site.translationPlugin,
+    });
+
     // Remove sensitive data from response
     const sanitizedSite = {
       ...site,
       appPassword: undefined,
     };
 
-    return NextResponse.json(
-      {
-        success: true,
-        data: {
-          site: sanitizedSite,
-          message: 'WordPress site added successfully',
-          pluginDetected: pluginInfo.plugin,
-        },
+    const response = {
+      success: true,
+      data: {
+        site: sanitizedSite,
+        message: 'WordPress site added successfully',
+        pluginDetected: pluginInfo.plugin,
       },
-      { status: 201 }
-    );
+    };
+
+    console.log('📤 [POST /api/wordpress-sites] Response:', {
+      success: response.success,
+      siteId: sanitizedSite.id,
+      siteName: sanitizedSite.name,
+      pluginDetected: pluginInfo.plugin,
+    });
+
+    return NextResponse.json(response, { status: 201 });
   } catch (error) {
+    console.error('❌ [POST /api/wordpress-sites] Error:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+    });
+    
     return NextResponse.json(
       {
         success: false,

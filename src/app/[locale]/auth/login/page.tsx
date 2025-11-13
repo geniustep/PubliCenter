@@ -24,7 +24,7 @@ export default function LoginPage() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const callbackUrl = searchParams.get('callbackUrl') || '/ar/dashboard';
+  const callbackUrl = searchParams.get('callbackUrl') || '/ar/articles';
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};

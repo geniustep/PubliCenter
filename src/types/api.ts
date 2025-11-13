@@ -362,13 +362,13 @@ export const RolePermissions: Record<UserRole, Permission[]> = {
     { resource: 'categories', actions: ['create', 'read', 'update', 'delete'] },
     { resource: 'templates', actions: ['read'] },
     { resource: 'users', actions: ['read'] },
-    { resource: 'wordpress-sites', actions: ['create', 'read', 'update', 'sync'] },
+    { resource: 'wordpress-sites', actions: ['create', 'read', 'update', 'delete', 'sync'] },
   ],
   [UserRole.AUTHOR]: [
     { resource: 'articles', actions: ['create', 'read', 'update', 'publish'] },
     { resource: 'categories', actions: ['read'] },
     { resource: 'templates', actions: ['read'] },
-    { resource: 'wordpress-sites', actions: ['read'] },
+    { resource: 'wordpress-sites', actions: ['create', 'read', 'update', 'delete', 'sync'] },
   ],
   [UserRole.CONTRIBUTOR]: [
     { resource: 'articles', actions: ['create', 'read', 'update'] },

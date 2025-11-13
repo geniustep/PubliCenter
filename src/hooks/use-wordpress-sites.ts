@@ -1,12 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type {
-  WordPressSite,
   CreateWordPressSiteRequest,
   UpdateWordPressSiteRequest,
   WordPressSiteFilters,
   WordPressSitesResponse,
   WordPressSiteResponse,
-  SyncWordPressSiteRequest,
   WordPressSyncResponse,
 } from '@/types/api';
 
@@ -24,7 +22,9 @@ export function useWordPressSites(filters?: WordPressSiteFilters) {
       if (filters?.language) params.append('language', filters.language);
       if (filters?.translationPlugin) params.append('translationPlugin', filters.translationPlugin);
 
-      const response = await fetch(`/api/wordpress-sites?${params}`);
+      const response = await fetch(`/api/wordpress-sites?${params}`, {
+        credentials: 'include', // Include cookies for authentication
+      });
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error || 'Failed to fetch WordPress sites');
@@ -42,7 +42,9 @@ export function useWordPressSite(id: number | null) {
     queryKey: ['wordpress-site', id],
     queryFn: async () => {
       if (!id) throw new Error('Site ID is required');
-      const response = await fetch(`/api/wordpress-sites/${id}`);
+      const response = await fetch(`/api/wordpress-sites/${id}`, {
+        credentials: 'include', // Include cookies for authentication
+      });
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error || 'Failed to fetch WordPress site');
@@ -62,20 +64,43 @@ export function useCreateWordPressSite() {
 
   return useMutation({
     mutationFn: async (data: CreateWordPressSiteRequest) => {
+      console.log('🟢 [Frontend] Sending POST request to /api/wordpress-sites');
+      console.log('📤 [Frontend] Request payload:', {
+        name: data.name,
+        url: data.url,
+        language: data.language,
+        username: data.username,
+        appPassword: data.appPassword ? `[HIDDEN - Length: ${data.appPassword.length}]` : undefined,
+      });
+
       const response = await fetch('/api/wordpress-sites', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Include cookies for authentication
         body: JSON.stringify(data),
       });
 
+      console.log('📥 [Frontend] Response status:', response.status, response.statusText);
+
       if (!response.ok) {
         const error = await response.json();
+        console.error('❌ [Frontend] Error response:', error);
         throw new Error(error.error || 'Failed to create WordPress site');
       }
 
-      return response.json() as Promise<WordPressSiteResponse>;
+      const result = await response.json();
+      console.log('✅ [Frontend] Success response:', {
+        success: result.success,
+        siteId: result.data?.site?.id,
+        siteName: result.data?.site?.name,
+        pluginDetected: result.data?.pluginDetected,
+        message: result.data?.message,
+      });
+
+      return result as WordPressSiteResponse;
     },
     onSuccess: () => {
+      console.log('🔄 [Frontend] Invalidating wordpress-sites query cache');
       queryClient.invalidateQueries({ queryKey: ['wordpress-sites'] });
     },
   });
@@ -92,6 +117,7 @@ export function useUpdateWordPressSite() {
       const response = await fetch(`/api/wordpress-sites/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Include cookies for authentication
         body: JSON.stringify(data),
       });
 
@@ -119,6 +145,7 @@ export function useDeleteWordPressSite() {
     mutationFn: async (id: number) => {
       const response = await fetch(`/api/wordpress-sites/${id}`, {
         method: 'DELETE',
+        credentials: 'include', // Include cookies for authentication
       });
 
       if (!response.ok) {
@@ -143,6 +170,7 @@ export function useTestWordPressSiteConnection() {
       const response = await fetch(`/api/wordpress-sites/${id}/test`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Include cookies for authentication
         body: JSON.stringify({ appPassword }),
       });
 
@@ -167,6 +195,7 @@ export function useDetectWordPressPlugin() {
       const response = await fetch(`/api/wordpress-sites/${id}/detect-plugin`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Include cookies for authentication
         body: JSON.stringify({ appPassword }),
       });
 
@@ -198,13 +227,14 @@ export function useSyncWordPressSite() {
       languages = [],
     }: {
       id: number;
-      appPassword: string;
+      appPassword?: string;
       syncMode?: 'full' | 'incremental';
       languages?: string[];
     }) => {
       const response = await fetch(`/api/wordpress-sites/${id}/sync`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Include cookies for authentication
         body: JSON.stringify({ appPassword, syncMode, languages }),
       });
 

@@ -5,9 +5,9 @@ import { i18n } from './i18n-config';
 
 // Paths that require authentication
 const protectedPaths = [
-  '/dashboard',
   '/publish',
   '/articles',
+  '/wordpress-sites',
   '/templates',
   '/categories',
   '/analytics',

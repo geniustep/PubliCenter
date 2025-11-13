@@ -18,7 +18,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useSyncWordPressSite } from '@/hooks/use-wordpress-sites';
 import { toast } from 'sonner';
 import { Loader2, RefreshCw, AlertCircle, CheckCircle2 } from 'lucide-react';
-import type { WordPressSite, Language } from '@/types/api';
+import type { WordPressSite } from '@/types/api';
 
 interface WordPressSyncDialogProps {
   open: boolean;
@@ -40,15 +40,11 @@ export function WordPressSyncDialog({ open, onOpenChange, site }: WordPressSyncD
   const handleSync = async () => {
     if (!site) return;
 
-    if (!appPassword) {
-      toast.error(t('wordpress.validation.appPasswordRequired'));
-      return;
-    }
-
     try {
+      // appPassword is optional - if not provided, server will use stored password
       const result = await syncSite.mutateAsync({
         id: site.id,
-        appPassword,
+        appPassword: appPassword || '', // Empty string means use stored password
         syncMode,
         languages: selectedLanguages.length > 0 ? selectedLanguages : [],
       });
@@ -91,19 +87,23 @@ export function WordPressSyncDialog({ open, onOpenChange, site }: WordPressSyncD
 
         {!syncResult ? (
           <div className="space-y-6 py-4">
-            {/* App Password */}
+            {/* App Password - Optional if already stored */}
             <div className="space-y-2">
-              <Label htmlFor="appPassword">{t('wordpress.appPassword')}</Label>
+              <Label htmlFor="appPassword">
+                {t('wordpress.appPassword')} <span className="text-muted-foreground text-xs">(اختياري)</span>
+              </Label>
               <Input
                 id="appPassword"
                 type="password"
-                placeholder="xxxx xxxx xxxx xxxx"
+                placeholder="اتركه فارغاً لاستخدام كلمة المرور المحفوظة"
                 value={appPassword}
                 onChange={(e) => setAppPassword(e.target.value)}
                 disabled={syncSite.isPending}
               />
               <p className="text-sm text-muted-foreground">
-                {t('wordpress.appPasswordHelp')}
+                {appPassword 
+                  ? t('wordpress.appPasswordHelp')
+                  : 'سيتم استخدام كلمة المرور المحفوظة. أدخل كلمة مرور جديدة فقط إذا تغيرت.'}
               </p>
             </div>
 
@@ -249,7 +249,7 @@ export function WordPressSyncDialog({ open, onOpenChange, site }: WordPressSyncD
             {syncResult ? t('common.close') : t('common.cancel')}
           </Button>
           {!syncResult && (
-            <Button onClick={handleSync} disabled={syncSite.isPending || !appPassword}>
+            <Button onClick={handleSync} disabled={syncSite.isPending}>
               {syncSite.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               {syncSite.isPending ? t('wordpress.syncing') : t('wordpress.syncArticles')}
             </Button>

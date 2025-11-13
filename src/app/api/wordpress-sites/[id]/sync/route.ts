@@ -7,6 +7,7 @@ import { createPluginDetector } from '@/lib/wordpress-plugin-detector';
 import { hasPermission } from '@/lib/rbac';
 import { Language, SyncStatus, TranslationPlugin } from '@/types/api';
 import { logger } from '@/lib/logger';
+import { decrypt } from '@/lib/encryption';
 
 /**
  * POST /api/wordpress-sites/[id]/sync
@@ -33,17 +34,7 @@ export const POST = asyncHandler(
 
     const siteId = parseInt(params.id);
     const body = await request.json();
-    const { appPassword, syncMode = 'incremental', languages = [] } = body;
-
-    if (!appPassword) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'App password required for sync',
-        },
-        { status: 400 }
-      );
-    }
+    const { appPassword: providedPassword, syncMode = 'incremental', languages = [] } = body;
 
     const site = await prisma.wordPressSite.findUnique({
       where: { id: siteId },
@@ -53,6 +44,36 @@ export const POST = asyncHandler(
       return NextResponse.json(
         { success: false, error: 'WordPress site not found' },
         { status: 404 }
+      );
+    }
+
+    // Use provided password or decrypt stored password
+    let appPassword: string;
+    if (providedPassword && providedPassword.trim() !== '') {
+      appPassword = providedPassword;
+    } else if (site.appPassword) {
+      try {
+        appPassword = decrypt(site.appPassword);
+      } catch (error) {
+        // If decryption fails, it might be an old hashed password
+        // In that case, require the user to provide the password
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'App password required',
+            details: 'Please provide the app password. The stored password cannot be used.',
+          },
+          { status: 400 }
+        );
+      }
+    } else {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'App password required',
+          details: 'No app password stored. Please provide the app password.',
+        },
+        { status: 400 }
       );
     }
 
@@ -155,6 +176,34 @@ export const POST = asyncHandler(
                 if (existingArticle) {
                   article = existingArticle;
                 } else {
+                  // Get or create default template
+                  let defaultTemplate = await prisma.template.findFirst({
+                    where: { isActive: true },
+                    orderBy: { sortOrder: 'asc' },
+                  });
+
+                  if (!defaultTemplate) {
+                    // Create a default template if none exists
+                    defaultTemplate = await prisma.template.create({
+                      data: {
+                        name: 'Default Template',
+                        nameAr: 'قالب افتراضي',
+                        nameEn: 'Default Template',
+                        nameFr: 'Modèle par défaut',
+                        nameEs: 'Plantilla predeterminada',
+                        slug: 'default-template',
+                        description: 'Default template for synced WordPress articles',
+                        descriptionAr: 'قالب افتراضي للمقالات المزامنة من WordPress',
+                        descriptionEn: 'Default template for synced WordPress articles',
+                        descriptionFr: 'Modèle par défaut pour les articles synchronisés depuis WordPress',
+                        descriptionEs: 'Plantilla predeterminada para artículos sincronizados de WordPress',
+                        layoutType: 'SINGLE_COLUMN',
+                        isActive: true,
+                        sortOrder: 0,
+                      },
+                    });
+                  }
+
                   // Create new article
                   article = await prisma.article.create({
                     data: {
@@ -164,7 +213,7 @@ export const POST = asyncHandler(
                       sourceLanguage: mappedLanguage,
                       status: post.status === 'publish' ? 'PUBLISHED' : 'DRAFT',
                       authorId: session.user.id,
-                      templateId: 1, // Default template - you may want to make this configurable
+                      templateId: defaultTemplate.id,
                       publishedAt: post.status === 'publish' ? new Date() : null,
                     },
                   });
@@ -289,17 +338,47 @@ export const POST = asyncHandler(
  * Map WordPress language code to our Language enum
  */
 function mapWordPressLanguageToEnum(wpLang: string): Language | null {
+  // Normalize the language code (lowercase and handle common variations)
+  const normalized = wpLang.toLowerCase().trim();
+  
   const mapping: Record<string, Language> = {
+    // Arabic variations
     ar: Language.AR,
-    ar_AR: Language.AR,
+    'ar_ar': Language.AR,
+    'ar-sa': Language.AR,
+    'ar_SA': Language.AR,
+    // English variations
     en: Language.EN,
-    en_US: Language.EN,
-    en_GB: Language.EN,
+    'en_us': Language.EN,
+    'en_gb': Language.EN,
+    'en-gb': Language.EN,
+    // French variations
     fr: Language.FR,
-    fr_FR: Language.FR,
+    'fr_fr': Language.FR,
+    'fr-FR': Language.FR,
+    // Spanish variations
     es: Language.ES,
-    es_ES: Language.ES,
+    'es_es': Language.ES,
+    'es-ES': Language.ES,
   };
 
-  return mapping[wpLang] || null;
+  // Try exact match first
+  if (mapping[normalized]) {
+    return mapping[normalized];
+  }
+
+  // Try matching first 2 characters (e.g., 'ar' from 'ar_AR' or 'AR')
+  const twoChar = normalized.substring(0, 2);
+  if (mapping[twoChar]) {
+    return mapping[twoChar];
+  }
+
+  // Try uppercase version (in case it's already uppercase like 'AR')
+  const upperNormalized = wpLang.toUpperCase().trim();
+  if (upperNormalized === 'AR') return Language.AR;
+  if (upperNormalized === 'EN') return Language.EN;
+  if (upperNormalized === 'FR') return Language.FR;
+  if (upperNormalized === 'ES') return Language.ES;
+
+  return null;
 }

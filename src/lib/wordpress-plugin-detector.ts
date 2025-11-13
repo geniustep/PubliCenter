@@ -333,7 +333,13 @@ export class WordPressPluginDetector {
     perPage: number = 10
   ): Promise<any[]> {
     try {
-      let params: any = { page, per_page: perPage };
+      // Order by date descending (newest first)
+      let params: any = { 
+        page, 
+        per_page: perPage,
+        orderby: 'date',
+        order: 'desc'
+      };
 
       switch (plugin) {
         case TranslationPlugin.WPML:
@@ -357,7 +363,14 @@ export class WordPressPluginDetector {
       }
 
       const response = await this.client.get('/wp/v2/posts', { params });
-      return response.data || [];
+      const posts = response.data || [];
+      
+      // Additional sorting by date to ensure newest first (in case API doesn't respect order)
+      return posts.sort((a: any, b: any) => {
+        const dateA = new Date(a.date || a.modified || 0).getTime();
+        const dateB = new Date(b.date || b.modified || 0).getTime();
+        return dateB - dateA; // Descending order (newest first)
+      });
     } catch (error) {
       logger.error('Failed to get posts by language', {
         plugin,

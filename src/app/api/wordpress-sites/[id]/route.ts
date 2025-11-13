@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth.config';
 import { prisma } from '@/lib/prisma';
 import { asyncHandler } from '@/lib/error-handler';
 import { z } from 'zod';
-import { hash } from 'bcryptjs';
+import { encrypt } from '@/lib/encryption';
 import { hasPermission } from '@/lib/rbac';
 import { Language } from '@/types/api';
 
@@ -136,7 +136,7 @@ export const PUT = asyncHandler(
 
     // If password is being updated, hash it
     if (updateData.appPassword) {
-      updateData.appPassword = await hash(updateData.appPassword, 12);
+      updateData.appPassword = encrypt(updateData.appPassword);
     }
 
     const site = await prisma.wordPressSite.update({
@@ -184,7 +184,16 @@ export const DELETE = asyncHandler(
     }
 
     // Check permissions
-    if (!hasPermission(session.user.role, 'wordpress-sites', 'delete')) {
+    const hasDeletePermission = hasPermission(session.user.role, 'wordpress-sites', 'delete');
+    console.log('🔐 [DELETE /api/wordpress-sites/[id]] Permission check:', {
+      role: session.user.role,
+      resource: 'wordpress-sites',
+      action: 'delete',
+      hasPermission: hasDeletePermission,
+    });
+
+    if (!hasDeletePermission) {
+      console.log('❌ [DELETE /api/wordpress-sites/[id]] Forbidden - No permission');
       return NextResponse.json(
         { success: false, error: 'Forbidden' },
         { status: 403 }
@@ -211,7 +220,13 @@ export const DELETE = asyncHandler(
     }
 
     // Check if site has translations
+    console.log('🔍 [DELETE /api/wordpress-sites/[id]] Checking translations:', {
+      siteId,
+      translationsCount: site._count.translations,
+    });
+
     if (site._count.translations > 0) {
+      console.log('❌ [DELETE /api/wordpress-sites/[id]] Cannot delete - has translations');
       return NextResponse.json(
         {
           success: false,
@@ -222,9 +237,11 @@ export const DELETE = asyncHandler(
       );
     }
 
+    console.log('🗑️ [DELETE /api/wordpress-sites/[id]] Deleting site:', siteId);
     await prisma.wordPressSite.delete({
       where: { id: siteId },
     });
+    console.log('✅ [DELETE /api/wordpress-sites/[id]] Site deleted successfully');
 
     return NextResponse.json({
       success: true,

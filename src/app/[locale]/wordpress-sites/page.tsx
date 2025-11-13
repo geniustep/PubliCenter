@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { Header } from '@/components/layout/header';
+import { Sidebar } from '@/components/layout/sidebar';
 import { useWordPressSites } from '@/hooks/use-wordpress-sites';
 import { WordPressSiteCard } from '@/components/wordpress/wordpress-site-card';
 import { WordPressSiteDialog } from '@/components/wordpress/wordpress-site-dialog';
@@ -67,23 +69,28 @@ export default function WordPressSitesPage() {
   const hasFilters = isActiveFilter !== undefined || languageFilter || pluginFilter;
 
   return (
-    <div className="container mx-auto py-8 space-y-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
-            <Server className="h-8 w-8 text-primary" />
-            {t('wordpress.title')}
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            إدارة ومزامنة مواقع WordPress المتصلة
-          </p>
-        </div>
-        <Button onClick={handleAddSite} size="lg">
-          <Plus className="h-5 w-5 mr-2" />
-          {t('wordpress.addSite')}
-        </Button>
-      </div>
+    <div className="flex h-screen flex-col">
+      <Header />
+      <div className="flex flex-1 overflow-hidden">
+        <Sidebar />
+        <main className="flex-1 overflow-y-auto">
+          <div className="container py-8 space-y-8">
+            {/* Header */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold flex items-center gap-3">
+                  <Server className="h-8 w-8 text-primary" />
+                  {t('wordpress.title')}
+                </h1>
+                <p className="text-muted-foreground mt-2">
+                  إدارة ومزامنة مواقع WordPress المتصلة
+                </p>
+              </div>
+              <Button onClick={handleAddSite} size="lg">
+                <Plus className="h-5 w-5 mr-2" />
+                {t('wordpress.addSite')}
+              </Button>
+            </div>
 
       {/* Filters */}
       <div className="flex flex-wrap gap-4 items-center p-6 bg-muted/50 rounded-lg">
@@ -231,18 +238,21 @@ export default function WordPressSitesPage() {
         </div>
       )}
 
-      {/* Dialogs */}
-      <WordPressSiteDialog
-        open={showSiteDialog}
-        onOpenChange={setShowSiteDialog}
-        site={selectedSite}
-      />
+            {/* Dialogs */}
+            <WordPressSiteDialog
+              open={showSiteDialog}
+              onOpenChange={setShowSiteDialog}
+              site={selectedSite}
+            />
 
-      <WordPressSyncDialog
-        open={showSyncDialog}
-        onOpenChange={setShowSyncDialog}
-        site={selectedSite}
-      />
+            <WordPressSyncDialog
+              open={showSyncDialog}
+              onOpenChange={setShowSyncDialog}
+              site={selectedSite}
+            />
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

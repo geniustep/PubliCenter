@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import {
   Card,
@@ -57,8 +58,10 @@ interface WordPressSiteCardProps {
 
 export function WordPressSiteCard({ site, onEdit, onSync }: WordPressSiteCardProps) {
   const t = useTranslations();
+  const params = useParams();
+  const locale = params.locale as string;
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const deleteS ite = useDeleteWordPressSite();
+  const deleteSite = useDeleteWordPressSite();
 
   const handleDelete = async () => {
     try {
@@ -80,7 +83,7 @@ export function WordPressSiteCard({ site, onEdit, onSync }: WordPressSiteCardPro
                 <Globe className="h-5 w-5 text-primary" />
                 <CardTitle className="text-lg">
                   <Link
-                    href={`/wordpress-sites/${site.id}`}
+                    href={`/${locale}/wordpress-sites/${site.id}`}
                     className="hover:underline"
                   >
                     {site.name}
@@ -200,7 +203,7 @@ export function WordPressSiteCard({ site, onEdit, onSync }: WordPressSiteCardPro
             {site._count?.translations || 0} {t('articles.translations')}
           </span>
           <Button variant="outline" size="sm" asChild>
-            <Link href={`/wordpress-sites/${site.id}`}>
+            <Link href={`/${locale}/wordpress-sites/${site.id}`}>
               {t('common.details')} →
             </Link>
           </Button>
