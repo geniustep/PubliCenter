@@ -12,6 +12,7 @@ import {
   PenSquare,
   Settings,
   Tags,
+  Server,
 } from 'lucide-react';
 
 const navItems = [
@@ -39,6 +40,11 @@ const navItems = [
     title: 'nav.categories',
     href: '/categories',
     icon: Tags,
+  },
+  {
+    title: 'nav.wordpress',
+    href: '/wordpress-sites',
+    icon: Server,
   },
   {
     title: 'nav.analytics',
