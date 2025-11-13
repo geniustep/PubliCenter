@@ -65,7 +65,7 @@ export const POST = asyncHandler(
       const pluginInfo = await detector.detectPlugin();
 
       // Update site with detected plugin info
-      const updatedSite = await prisma.wordPressSite.update({
+      await prisma.wordPressSite.update({
         where: { id: siteId },
         data: {
           translationPlugin: pluginInfo.plugin,

@@ -23,7 +23,7 @@ const updateSiteSchema = z.object({
  * Get a specific WordPress site
  */
 export const GET = asyncHandler(
-  async (request: NextRequest, { params }: { params: { id: string } }) => {
+  async (_request: NextRequest, { params }: { params: { id: string } }) => {
     const session = await getServerSession(authOptions);
 
     if (!session?.user) {
@@ -173,7 +173,7 @@ export const PUT = asyncHandler(
  * Delete a WordPress site
  */
 export const DELETE = asyncHandler(
-  async (request: NextRequest, { params }: { params: { id: string } }) => {
+  async (_request: NextRequest, { params }: { params: { id: string } }) => {
     const session = await getServerSession(authOptions);
 
     if (!session?.user) {

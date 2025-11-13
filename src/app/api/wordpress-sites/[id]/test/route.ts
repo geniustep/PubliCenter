@@ -3,16 +3,14 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth.config';
 import { prisma } from '@/lib/prisma';
 import { asyncHandler } from '@/lib/error-handler';
-import { createWordPressClient } from '@/lib/wordpress';
 import { hasPermission } from '@/lib/rbac';
-import { compare } from 'bcryptjs';
 
 /**
  * POST /api/wordpress-sites/[id]/test
  * Test connection to WordPress site
  */
 export const POST = asyncHandler(
-  async (request: NextRequest, { params }: { params: { id: string } }) => {
+  async (_request: NextRequest, { params }: { params: { id: string } }) => {
     const session = await getServerSession(authOptions);
 
     if (!session?.user) {
