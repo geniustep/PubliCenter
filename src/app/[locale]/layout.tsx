@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { i18n, localeDirections } from '@/i18n-config';
 import { Toaster } from '@/components/ui/toaster';
 import { QueryProvider } from '@/providers/query-provider';
+import { AuthProvider } from '@/providers/auth-provider';
 import '../globals.css';
 
 export default async function LocaleLayout({
@@ -27,12 +28,14 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} dir={dir} suppressHydrationWarning>
       <body className="font-sans antialiased">
-        <QueryProvider>
-          <NextIntlClientProvider messages={messages}>
-            {children}
-            <Toaster />
-          </NextIntlClientProvider>
-        </QueryProvider>
+        <AuthProvider>
+          <QueryProvider>
+            <NextIntlClientProvider messages={messages}>
+              {children}
+              <Toaster />
+            </NextIntlClientProvider>
+          </QueryProvider>
+        </AuthProvider>
       </body>
     </html>
   );

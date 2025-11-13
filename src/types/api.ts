@@ -51,13 +51,25 @@ export enum LayoutType {
   MAGAZINE = 'MAGAZINE'
 }
 
+export enum UserRole {
+  ADMIN = 'ADMIN',
+  EDITOR = 'EDITOR',
+  AUTHOR = 'AUTHOR',
+  CONTRIBUTOR = 'CONTRIBUTOR',
+  VIEWER = 'VIEWER'
+}
+
 // Entity Types
 export interface User {
   id: string;
   name: string | null;
   email: string;
-  role: 'ADMIN' | 'EDITOR' | 'VIEWER';
+  emailVerified: string | null;
+  image: string | null;
+  role: UserRole;
+  isActive: boolean;
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface Category {
@@ -197,6 +209,67 @@ export interface ContactFormRequest {
   message: string;
 }
 
+// Authentication Types
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface RegisterRequest {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
+export interface AuthSession {
+  user: {
+    id: string;
+    name: string | null;
+    email: string;
+    image: string | null;
+    role: UserRole;
+  };
+  expires: string;
+}
+
+export interface Permission {
+  resource: string;
+  actions: string[];
+}
+
+// Role Permissions Map
+export const RolePermissions: Record<UserRole, Permission[]> = {
+  [UserRole.ADMIN]: [
+    { resource: 'articles', actions: ['create', 'read', 'update', 'delete', 'publish'] },
+    { resource: 'categories', actions: ['create', 'read', 'update', 'delete'] },
+    { resource: 'templates', actions: ['create', 'read', 'update', 'delete'] },
+    { resource: 'users', actions: ['create', 'read', 'update', 'delete'] },
+    { resource: 'settings', actions: ['read', 'update'] },
+  ],
+  [UserRole.EDITOR]: [
+    { resource: 'articles', actions: ['create', 'read', 'update', 'delete', 'publish'] },
+    { resource: 'categories', actions: ['create', 'read', 'update', 'delete'] },
+    { resource: 'templates', actions: ['read'] },
+    { resource: 'users', actions: ['read'] },
+  ],
+  [UserRole.AUTHOR]: [
+    { resource: 'articles', actions: ['create', 'read', 'update', 'publish'] },
+    { resource: 'categories', actions: ['read'] },
+    { resource: 'templates', actions: ['read'] },
+  ],
+  [UserRole.CONTRIBUTOR]: [
+    { resource: 'articles', actions: ['create', 'read', 'update'] },
+    { resource: 'categories', actions: ['read'] },
+    { resource: 'templates', actions: ['read'] },
+  ],
+  [UserRole.VIEWER]: [
+    { resource: 'articles', actions: ['read'] },
+    { resource: 'categories', actions: ['read'] },
+    { resource: 'templates', actions: ['read'] },
+  ],
+};
+
 // API Response Type Aliases
 export type ArticlesResponse = PaginatedResponse<Article>;
 export type ArticleResponse = ApiResponse<Article>;
@@ -205,3 +278,4 @@ export type TemplateResponse = ApiResponse<Template>;
 export type CategoriesResponse = ApiResponse<Category[]>;
 export type CategoryResponse = ApiResponse<Category>;
 export type ContactResponse = ApiResponse<{ message: string }>;
+export type AuthResponse = ApiResponse<{ user: User; token?: string }>;
