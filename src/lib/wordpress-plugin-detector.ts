@@ -126,10 +126,12 @@ export class WordPressPluginDetector {
    * Enhanced detection with multiple methods
    */
   private async detectPolylang(): Promise<PluginDetectionResult | null> {
+    console.log('🔍 [Plugin Detector] Starting Polylang detection...');
     try {
       logger.debug('Attempting Polylang detection', { siteUrl: this.siteUrl });
 
       // Method 1: Check installed plugins list
+      console.log('🔍 [Plugin Detector] Method 1: Checking plugins list via /wp/v2/plugins');
       try {
         const pluginsResponse = await this.client.get('/wp/v2/plugins');
         if (pluginsResponse.data && Array.isArray(pluginsResponse.data)) {
@@ -162,13 +164,16 @@ export class WordPressPluginDetector {
       }
 
       // Method 2: Check for language taxonomy
+      console.log('🔍 [Plugin Detector] Method 2: Checking taxonomies via /wp/v2/taxonomies');
       try {
         const taxonomiesResponse = await this.client.get('/wp/v2/taxonomies');
         if (taxonomiesResponse.data &&
             (taxonomiesResponse.data.language || taxonomiesResponse.data.term_language)) {
+          console.log('✅ [Plugin Detector] Polylang detected via taxonomies!');
           logger.info('Polylang detected via taxonomies', { siteUrl: this.siteUrl });
 
           const languages = await this.getPolylangLanguages();
+          console.log('🌐 [Plugin Detector] Polylang languages found:', languages);
           return {
             plugin: TranslationPlugin.POLYLANG,
             version: null,
@@ -178,12 +183,16 @@ export class WordPressPluginDetector {
               detectionMethod: 'taxonomies',
             },
           };
+        } else {
+          console.log('❌ [Plugin Detector] Polylang taxonomies not found');
         }
       } catch (error) {
+        console.log('❌ [Plugin Detector] Method 2 failed:', error instanceof Error ? error.message : 'Unknown error');
         logger.debug('Taxonomies check failed', { error });
       }
 
       // Method 3: Check posts with lang parameter
+      console.log('🔍 [Plugin Detector] Method 3: Checking posts API with lang parameter');
       try {
         const response = await this.client.get('/wp/v2/posts', {
           params: { per_page: 1, lang: 'all' },
@@ -192,11 +201,16 @@ export class WordPressPluginDetector {
         // Check if response headers contain polylang info or if lang parameter was accepted
         if (response.headers['x-polylang-version'] ||
             response.status === 200) {
+          console.log('✅ [Plugin Detector] Posts API accepted lang parameter');
 
           const languages = await this.getPolylangLanguages();
 
           // If we got languages, Polylang is likely active
           if (languages.length > 0) {
+            console.log('✅ [Plugin Detector] Polylang detected via posts API!', {
+              languages,
+              version: response.headers['x-polylang-version'] || null,
+            });
             logger.info('Polylang detected via posts API', {
               siteUrl: this.siteUrl,
               languages
@@ -211,13 +225,17 @@ export class WordPressPluginDetector {
                 detectionMethod: 'posts-api',
               },
             };
+          } else {
+            console.log('❌ [Plugin Detector] No languages found from posts API');
           }
         }
       } catch (error) {
+        console.log('❌ [Plugin Detector] Method 3 failed:', error instanceof Error ? error.message : 'Unknown error');
         logger.debug('Posts API check failed', { error });
       }
 
       // Method 4: Check for Polylang REST API endpoints
+      console.log('🔍 [Plugin Detector] Method 4: Checking Polylang REST API /pll/v1/languages');
       try {
         const polylangApiResponse = await this.client.get('/pll/v1/languages');
         if (polylangApiResponse.status === 200 && polylangApiResponse.data) {
@@ -225,6 +243,10 @@ export class WordPressPluginDetector {
             ? polylangApiResponse.data.map((lang: any) => lang.slug || lang.locale)
             : [];
 
+          console.log('✅ [Plugin Detector] Polylang detected via Polylang API!', {
+            languages,
+            version: polylangApiResponse.headers['x-polylang-version'] || null,
+          });
           logger.info('Polylang detected via Polylang API', {
             siteUrl: this.siteUrl,
             languages
@@ -239,11 +261,15 @@ export class WordPressPluginDetector {
               detectionMethod: 'polylang-api',
             },
           };
+        } else {
+          console.log('❌ [Plugin Detector] Polylang API returned status:', polylangApiResponse.status);
         }
       } catch (error) {
+        console.log('❌ [Plugin Detector] Method 4 failed:', error instanceof Error ? error.message : 'Unknown error');
         logger.debug('Polylang API check failed', { error });
       }
 
+      console.log('❌ [Plugin Detector] Polylang not detected after all 4 methods');
       logger.debug('Polylang not detected after all methods', { siteUrl: this.siteUrl });
     } catch (error) {
       logger.debug('Polylang detection failed', {

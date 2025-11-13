@@ -51,44 +51,48 @@ export default function WordPressSiteDetailPage() {
     if (!site) return;
     
     if (!confirm(t('wordpress.deleteConfirm'))) {
+      toast.info(t('common.cancelled'));
       return;
     }
 
+    const toastId = toast.loading(t('wordpress.deleting'));
     try {
-      await deleteSite.mutateAsync(site.id);
-      toast.success(t('wordpress.deleteSuccess'));
+      await deleteSite.mutateAsync({ id: site.id });
+      toast.success(t('wordpress.deleteSuccess'), { id: toastId });
       router.push('/wordpress-sites');
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : t('wordpress.deleteError'));
+      toast.error(error instanceof Error ? error.message : t('wordpress.deleteError'), { id: toastId });
     }
   };
 
   const handleTestConnection = async () => {
     if (!site) return;
 
+    const toastId = toast.loading(t('wordpress.testingConnection'));
     try {
       await testConnection.mutateAsync({
         id: site.id,
         appPassword: '', // Will use stored password
       });
-      toast.success(t('wordpress.testSuccess'));
+      toast.success(t('wordpress.testSuccess'), { id: toastId });
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : t('wordpress.testError'));
+      toast.error(error instanceof Error ? error.message : t('wordpress.testError'), { id: toastId });
     }
   };
 
   const handleDetectPlugin = async () => {
     if (!site) return;
 
+    const toastId = toast.loading(t('wordpress.detectingPlugin'));
     try {
       await detectPlugin.mutateAsync({
         id: site.id,
         appPassword: '', // Will use stored password
       });
-      toast.success(t('wordpress.pluginDetected'));
+      toast.success(t('wordpress.pluginDetected'), { id: toastId });
       refetch();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : t('wordpress.pluginDetectionError'));
+      toast.error(error instanceof Error ? error.message : t('wordpress.pluginDetectionError'), { id: toastId });
     }
   };
 
@@ -218,14 +222,24 @@ export default function WordPressSiteDetailPage() {
               <div className="flex gap-2">
                 <Button
                   variant="outline"
-                  onClick={() => setShowEditDialog(true)}
+                  onClick={() => {
+                    toast.info(t('wordpress.openingEditDialog'));
+                    setShowEditDialog(true);
+                  }}
                 >
                   <Edit className="h-4 w-4 mr-2" />
                   {t('common.edit')}
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => setShowSyncDialog(true)}
+                  onClick={() => {
+                    if (!site.isActive) {
+                      toast.warning(t('wordpress.siteInactive'));
+                      return;
+                    }
+                    toast.info(t('wordpress.openingSyncDialog'));
+                    setShowSyncDialog(true);
+                  }}
                   disabled={!site.isActive}
                 >
                   <RefreshCw className="h-4 w-4 mr-2" />
@@ -236,7 +250,11 @@ export default function WordPressSiteDetailPage() {
                   onClick={handleDelete}
                   disabled={deleteSite.isPending}
                 >
-                  <Trash2 className="h-4 w-4 mr-2" />
+                  {deleteSite.isPending ? (
+                    <Spinner size="sm" className="mr-2" />
+                  ) : (
+                    <Trash2 className="h-4 w-4 mr-2" />
+                  )}
                   {t('common.delete')}
                 </Button>
               </div>
@@ -410,7 +428,10 @@ export default function WordPressSiteDetailPage() {
                   </Button>
                   <Button
                     variant="outline"
-                    onClick={() => window.open(site.url, '_blank')}
+                    onClick={() => {
+                      toast.info(t('wordpress.openingSite'));
+                      window.open(site.url, '_blank');
+                    }}
                   >
                     <ExternalLink className="h-4 w-4 mr-2" />
                     {t('wordpress.visitSite')}
