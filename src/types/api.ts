@@ -59,6 +59,24 @@ export enum UserRole {
   VIEWER = 'VIEWER'
 }
 
+export enum TranslationPlugin {
+  NONE = 'NONE',
+  WPML = 'WPML',
+  POLYLANG = 'POLYLANG',
+  TRANSLATEPRESS = 'TRANSLATEPRESS',
+  WEGLOT = 'WEGLOT',
+  LOCO_TRANSLATE = 'LOCO_TRANSLATE',
+  QTRANSLATE_XT = 'QTRANSLATE_XT'
+}
+
+export enum SyncStatus {
+  IDLE = 'IDLE',
+  SYNCING = 'SYNCING',
+  SUCCESS = 'SUCCESS',
+  FAILED = 'FAILED',
+  PARTIAL = 'PARTIAL'
+}
+
 // Entity Types
 export interface User {
   id: string;
@@ -121,11 +139,24 @@ export interface Translation {
   title: string;
   content: string;
   excerpt: string | null;
+  slug: string;
   status: TranslationStatus;
+
+  // WordPress integration
+  wordPressSiteId: number | null;
+  wordPressSite?: WordPressSite;
   wordpressPostId: number | null;
-  wordpressSiteId: number | null;
-  publishedAt: string | null;
-  errorMessage: string | null;
+  wordpressUrl: string | null;
+  publishedToWp: boolean;
+  publishedToWpAt: string | null;
+  syncedFromWp: boolean;
+  syncedFromWpAt: string | null;
+
+  // Metadata
+  metaTitle: string | null;
+  metaDescription: string | null;
+
+  translatedAt: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -161,10 +192,35 @@ export interface WordPressSite {
   url: string;
   language: Language;
   username: string;
+  appPassword: string;
+
+  // معلومات البلوجن
+  translationPlugin: TranslationPlugin;
+  pluginVersion: string | null;
+  pluginSettings: any;
+
+  // حالة الموقع
   isActive: boolean;
-  lastSyncAt: string | null;
+  lastSync: string | null;
+  lastSyncStatus: SyncStatus | null;
+  lastSyncError: string | null;
+
+  // الإحصائيات
+  totalArticles: number;
+  syncedArticles: number;
+
+  // اللغات المدعومة
+  supportedLanguages: string[] | null;
+
+  // التواريخ
   createdAt: string;
   updatedAt: string;
+
+  // Relations (optional)
+  translations?: Translation[];
+  _count?: {
+    translations: number;
+  };
 }
 
 // API Request Types
@@ -209,6 +265,56 @@ export interface ContactFormRequest {
   message: string;
 }
 
+// WordPress Site Management Types
+export interface CreateWordPressSiteRequest {
+  name: string;
+  url: string;
+  language: Language;
+  username: string;
+  appPassword: string;
+}
+
+export interface UpdateWordPressSiteRequest {
+  name?: string;
+  url?: string;
+  language?: Language;
+  username?: string;
+  appPassword?: string;
+  isActive?: boolean;
+}
+
+export interface WordPressSiteFilters {
+  page?: number;
+  limit?: number;
+  isActive?: boolean;
+  language?: Language;
+  translationPlugin?: TranslationPlugin;
+}
+
+export interface SyncWordPressSiteRequest {
+  siteId: number;
+  syncMode?: 'full' | 'incremental'; // full = all articles, incremental = only new/updated
+  languages?: Language[]; // Languages to sync, if empty sync all
+}
+
+export interface WordPressArticle {
+  id: number;
+  title: string;
+  content: string;
+  excerpt: string;
+  slug: string;
+  status: string;
+  link: string;
+  language: string;
+  translations?: {
+    [key: string]: {
+      id: number;
+      title: string;
+      link: string;
+    };
+  };
+}
+
 // Authentication Types
 export interface LoginRequest {
   email: string;
@@ -246,27 +352,32 @@ export const RolePermissions: Record<UserRole, Permission[]> = {
     { resource: 'templates', actions: ['create', 'read', 'update', 'delete'] },
     { resource: 'users', actions: ['create', 'read', 'update', 'delete'] },
     { resource: 'settings', actions: ['read', 'update'] },
+    { resource: 'wordpress-sites', actions: ['create', 'read', 'update', 'delete', 'sync'] },
   ],
   [UserRole.EDITOR]: [
     { resource: 'articles', actions: ['create', 'read', 'update', 'delete', 'publish'] },
     { resource: 'categories', actions: ['create', 'read', 'update', 'delete'] },
     { resource: 'templates', actions: ['read'] },
     { resource: 'users', actions: ['read'] },
+    { resource: 'wordpress-sites', actions: ['create', 'read', 'update', 'sync'] },
   ],
   [UserRole.AUTHOR]: [
     { resource: 'articles', actions: ['create', 'read', 'update', 'publish'] },
     { resource: 'categories', actions: ['read'] },
     { resource: 'templates', actions: ['read'] },
+    { resource: 'wordpress-sites', actions: ['read'] },
   ],
   [UserRole.CONTRIBUTOR]: [
     { resource: 'articles', actions: ['create', 'read', 'update'] },
     { resource: 'categories', actions: ['read'] },
     { resource: 'templates', actions: ['read'] },
+    { resource: 'wordpress-sites', actions: ['read'] },
   ],
   [UserRole.VIEWER]: [
     { resource: 'articles', actions: ['read'] },
     { resource: 'categories', actions: ['read'] },
     { resource: 'templates', actions: ['read'] },
+    { resource: 'wordpress-sites', actions: ['read'] },
   ],
 };
 
@@ -279,3 +390,14 @@ export type CategoriesResponse = ApiResponse<Category[]>;
 export type CategoryResponse = ApiResponse<Category>;
 export type ContactResponse = ApiResponse<{ message: string }>;
 export type AuthResponse = ApiResponse<{ user: User; token?: string }>;
+
+// WordPress API Response Type Aliases
+export type WordPressSitesResponse = PaginatedResponse<WordPressSite>;
+export type WordPressSiteResponse = ApiResponse<WordPressSite>;
+export type WordPressSyncResponse = ApiResponse<{
+  site: WordPressSite;
+  articlesFound: number;
+  articlesSynced: number;
+  articlesSkipped: number;
+  errors: string[];
+}>;
