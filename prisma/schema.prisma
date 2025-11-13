@@ -209,10 +209,14 @@ model Translation {
   slug              String
 
   // WordPress integration
-  wordpressPostId   Int?
-  wordpressUrl      String?
+  wordPressSiteId   Int?            // الموقع الذي تم النشر إليه
+  wordPressSite     WordPressSite?  @relation(fields: [wordPressSiteId], references: [id], onDelete: SetNull)
+  wordpressPostId   Int?            // معرّف المقالة في ووردبريس
+  wordpressUrl      String?         // رابط المقالة في ووردبريس
   publishedToWp     Boolean         @default(false)
-  publishedToWpAt   DateTime?
+  publishedToWpAt   DateTime?       // تاريخ النشر إلى ووردبريس
+  syncedFromWp      Boolean         @default(false) // هل تم جلبها من ووردبريس؟
+  syncedFromWpAt    DateTime?       // تاريخ الجلب من ووردبريس
 
   // Metadata
   metaTitle         String?
@@ -226,6 +230,7 @@ model Translation {
   @@unique([articleId, language])
   @@index([articleId])
   @@index([language])
+  @@index([wordPressSiteId])
   @@index([wordpressPostId])
   @@map("translations")
 }
@@ -264,4 +269,63 @@ model Cache {
 
   @@index([expiresAt])
   @@map("cache")
+}
+
+// WordPress Site model - للمواقع المتصلة بووردبريس
+model WordPressSite {
+  id                  Int                   @id @default(autoincrement())
+  name                String                // اسم الموقع (مثل: "المدونة الرئيسية")
+  url                 String                @unique // رابط الموقع (https://example.com)
+  language            Language              @default(AR) // اللغة الأساسية للموقع
+  username            String                // اسم المستخدم في ووردبريس
+  appPassword         String                // كلمة المرور للتطبيق (مشفرة)
+
+  // معلومات البلوجن
+  translationPlugin   TranslationPlugin     @default(NONE)
+  pluginVersion       String?               // إصدار البلوجن
+  pluginSettings      Json?                 // إعدادات البلوجن (مخزنة كـ JSON)
+
+  // حالة الموقع
+  isActive            Boolean               @default(true)
+  lastSync            DateTime?             // آخر مزامنة
+  lastSyncStatus      SyncStatus?           @default(IDLE)
+  lastSyncError       String?               // آخر خطأ في المزامنة
+
+  // الإحصائيات
+  totalArticles       Int                   @default(0)
+  syncedArticles      Int                   @default(0)
+
+  // اللغات المدعومة (مصفوفة JSON)
+  supportedLanguages  Json?                 // ['ar', 'en', 'fr', 'es']
+
+  // التواريخ
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+
+  // العلاقات
+  translations        Translation[]
+
+  @@index([isActive])
+  @@index([lastSync])
+  @@map("wordpress_sites")
+}
+
+// أنواع بلوجنات الترجمة المدعومة
+enum TranslationPlugin {
+  NONE              // لا يوجد بلوجن
+  WPML              // WPML Multilingual CMS
+  POLYLANG          // Polylang
+  TRANSLATEPRESS    // TranslatePress
+  WEGLOT            // Weglot Translate
+  LOCO_TRANSLATE    // Loco Translate
+  QTRANSLATE_XT     // qTranslate-XT
+}
+
+// حالة المزامنة
+enum SyncStatus {
+  IDLE              // في وضع الانتظار
+  SYNCING           // جاري المزامنة
+  SUCCESS           // نجحت المزامنة
+  FAILED            // فشلت المزامنة
+  PARTIAL           // مزامنة جزئية (بعض المقالات نجحت)
 }
