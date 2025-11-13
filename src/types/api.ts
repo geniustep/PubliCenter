@@ -404,3 +404,278 @@ export type WordPressSyncResponse = ApiResponse<{
   articlesSkipped: number;
   errors: string[];
 }>;
+
+// ============================================================================
+// Enhanced Article & Translation Types (للميزات الإبداعية)
+// ============================================================================
+
+/**
+ * Translation Quality Metrics - مقاييس جودة الترجمة
+ */
+export interface TranslationQualityMetrics {
+  overall: number;              // 0-100 - الجودة الإجمالية
+  grammar: number;              // 0-100 - النحو والصرف
+  readability: number;          // 0-100 - سهولة القراءة
+  seoScore: number;             // 0-100 - تحسين محركات البحث
+  consistency: number;          // 0-100 - الاتساق مع الأصل
+  culturalFit: number;          // 0-100 - الملاءمة الثقافية
+  suggestions: string[];        // اقتراحات التحسين
+}
+
+/**
+ * Enhanced Translation - ترجمة محسّنة مع معلومات إضافية
+ */
+export interface EnhancedTranslation extends Translation {
+  qualityMetrics?: TranslationQualityMetrics;
+  needsReview: boolean;
+  hasChanges: boolean;          // هل تغير الأصل بعد الترجمة؟
+  isAutoTranslated: boolean;    // هل ترجمة آلية؟
+  wordCount: number;
+  characterCount: number;
+  readingTime: number;          // بالدقائق
+  lastModifiedBy?: string;      // اسم آخر معدّل
+}
+
+/**
+ * Translation Progress - تقدم الترجمة
+ */
+export interface TranslationProgress {
+  overall: number;              // 85% - نسبة الترجمات المكتملة
+  quality: number;              // 4.5/5 - متوسط جودة الترجمات
+  completeness: Record<Language, number>; // نسبة الاكتمال لكل لغة
+  missingLanguages: Language[]; // اللغات المفقودة
+  needsReview: Language[];      // اللغات التي تحتاج مراجعة
+  outOfSync: Language[];        // ترجمات قديمة تحتاج تحديث
+}
+
+/**
+ * Article Analytics - تحليلات المقالة
+ */
+export interface ArticleAnalytics {
+  views: number;
+  shares: number;
+  comments: number;
+  likes: number;
+  readingTime: number;          // بالدقائق
+  engagement: number;           // 0-100
+  viewsByLanguage: Record<Language, number>;
+  trending: boolean;
+  trendingScore: number;        // 0-100
+}
+
+/**
+ * Enhanced Article - مقالة محسّنة مع جميع المعلومات
+ */
+export interface EnhancedArticle extends Article {
+  translationProgress: TranslationProgress;
+  analytics: ArticleAnalytics;
+  enhancedTranslations?: EnhancedTranslation[];
+  primaryImage?: ArticleImage;
+  tags?: string[];
+  collaborators?: User[];
+}
+
+/**
+ * Article View Mode - وضع عرض المقالات
+ */
+export enum ArticleViewMode {
+  COMPACT = 'COMPACT',         // عرض مضغوط للقوائم الطويلة
+  GRID = 'GRID',               // عرض شبكي
+  EXPANDED = 'EXPANDED',       // عرض موسّع بكل التفاصيل
+  LIST = 'LIST'                // عرض قائمة تقليدية
+}
+
+/**
+ * Article Sort Options - خيارات الترتيب
+ */
+export enum ArticleSortBy {
+  DATE_DESC = 'DATE_DESC',     // الأحدث أولاً
+  DATE_ASC = 'DATE_ASC',       // الأقدم أولاً
+  TITLE_AZ = 'TITLE_AZ',       // أبجدياً أ-ي
+  TITLE_ZA = 'TITLE_ZA',       // أبجدياً ي-أ
+  VIEWS = 'VIEWS',             // الأكثر مشاهدة
+  QUALITY = 'QUALITY',         // الأعلى جودة
+  POPULARITY = 'POPULARITY',   // الأكثر شعبية
+  TRENDING = 'TRENDING'        // الرائجة
+}
+
+/**
+ * Translation Filter Status - حالة تصفية الترجمات
+ */
+export enum TranslationFilterStatus {
+  ALL = 'ALL',
+  COMPLETE = 'COMPLETE',       // مكتملة 100%
+  PARTIAL = 'PARTIAL',         // مكتملة جزئياً
+  MISSING = 'MISSING',         // مفقودة
+  NEEDS_REVIEW = 'NEEDS_REVIEW', // تحتاج مراجعة
+  OUT_OF_SYNC = 'OUT_OF_SYNC'  // قديمة تحتاج تحديث
+}
+
+/**
+ * Article Filters - فلاتر المقالات
+ */
+export interface ArticleFilters {
+  status?: ArticleStatus[];
+  sourceLanguage?: Language;
+  translationStatus?: TranslationFilterStatus;
+  languages?: Language[];
+  qualityMin?: number;         // 0-100
+  qualityMax?: number;         // 0-100
+  categoryId?: number;
+  templateId?: number;
+  authorId?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  trending?: boolean;
+  hasImages?: boolean;
+  search?: string;
+  tags?: string[];
+  page?: number;
+  limit?: number;
+  sortBy?: ArticleSortBy;
+}
+
+/**
+ * Bulk Action Type - نوع الإجراء الجماعي
+ */
+export enum BulkActionType {
+  TRANSLATE = 'TRANSLATE',           // ترجمة
+  UPDATE_TRANSLATIONS = 'UPDATE_TRANSLATIONS', // تحديث الترجمات
+  PUBLISH = 'PUBLISH',               // نشر
+  UNPUBLISH = 'UNPUBLISH',           // إلغاء النشر
+  DELETE = 'DELETE',                 // حذف
+  ARCHIVE = 'ARCHIVE',               // أرشفة
+  CHANGE_CATEGORY = 'CHANGE_CATEGORY', // تغيير التصنيف
+  QUALITY_CHECK = 'QUALITY_CHECK',   // فحص الجودة
+  EXPORT = 'EXPORT',                 // تصدير
+  SYNC_TO_WORDPRESS = 'SYNC_TO_WORDPRESS' // مزامنة مع WordPress
+}
+
+/**
+ * Bulk Action Request - طلب إجراء جماعي
+ */
+export interface BulkActionRequest {
+  action: BulkActionType;
+  articleIds: number[];
+  options?: {
+    targetLanguages?: Language[];
+    categoryId?: number;
+    status?: ArticleStatus;
+    wordPressSiteId?: number;
+    autoPublish?: boolean;
+    force?: boolean;
+  };
+}
+
+/**
+ * Bulk Action Response - نتيجة الإجراء الجماعي
+ */
+export interface BulkActionResponse {
+  success: boolean;
+  processed: number;
+  succeeded: number;
+  failed: number;
+  errors: Array<{
+    articleId: number;
+    error: string;
+  }>;
+  results: any[];
+}
+
+/**
+ * Translation Generation Options - خيارات توليد الترجمة
+ */
+export interface TranslationGenerationOptions {
+  targetLanguage: Language;
+  articleId: number;
+  useAI?: boolean;              // استخدام الذكاء الاصطناعي
+  preserveFormatting?: boolean; // الحفاظ على التنسيق
+  includeMetadata?: boolean;    // تضمين البيانات الوصفية
+  qualityLevel?: 'fast' | 'balanced' | 'quality'; // مستوى الجودة
+  reviewRequired?: boolean;     // يتطلب مراجعة
+}
+
+/**
+ * Article Import Preview - معاينة استيراد المقالات
+ */
+export interface ArticleImportPreview {
+  total: number;
+  articles: Array<{
+    wpPostId: number;
+    title: string;
+    language: Language;
+    publishedAt: string;
+    category: string;
+    featured_image?: string;
+    excerpt?: string;
+    alreadyImported: boolean;
+  }>;
+  statistics: {
+    byLanguage: Record<Language, number>;
+    byCategory: Record<string, number>;
+    byMonth: Record<string, number>;
+  };
+}
+
+/**
+ * Article Import Options - خيارات استيراد المقالات
+ */
+export interface ArticleImportOptions {
+  wpSiteId: number;
+  articleIds?: number[];        // إذا فارغة، استيراد الكل
+  languages?: Language[];       // اللغات المراد استيرادها
+  includeImages?: boolean;
+  includeCategories?: boolean;
+  includeTags?: boolean;
+  autoPublish?: boolean;
+  dateFrom?: string;
+  dateTo?: string;
+  onlyPublished?: boolean;
+}
+
+/**
+ * Article Export Options - خيارات تصدير المقالات
+ */
+export interface ArticleExportOptions {
+  articleIds: number[];
+  format: 'json' | 'csv' | 'xml' | 'markdown';
+  includeTranslations?: boolean;
+  includeImages?: boolean;
+  includeMetadata?: boolean;
+  languages?: Language[];
+}
+
+/**
+ * Collaboration Activity - نشاط التعاون
+ */
+export interface CollaborationActivity {
+  userId: string;
+  userName: string;
+  userImage?: string;
+  action: 'translating' | 'reviewing' | 'editing' | 'commenting';
+  language?: Language;
+  progress?: number;            // 0-100
+  timestamp: string;
+  comments?: number;
+}
+
+/**
+ * Article Card Display Options - خيارات عرض بطاقة المقالة
+ */
+export interface ArticleCardDisplayOptions {
+  showAnalytics?: boolean;
+  showQualityMetrics?: boolean;
+  showCollaboration?: boolean;
+  showTranslationProgress?: boolean;
+  showPrimaryImage?: boolean;
+  enableQuickActions?: boolean;
+  enablePreview?: boolean;
+  compactMode?: boolean;
+}
+
+// API Response Type Aliases للأنواع الجديدة
+export type EnhancedArticlesResponse = PaginatedResponse<EnhancedArticle>;
+export type EnhancedArticleResponse = ApiResponse<EnhancedArticle>;
+export type BulkActionResponseType = ApiResponse<BulkActionResponse>;
+export type ArticleImportPreviewResponse = ApiResponse<ArticleImportPreview>;
+export type TranslationQualityResponse = ApiResponse<TranslationQualityMetrics>;
