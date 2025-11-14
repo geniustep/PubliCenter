@@ -20,20 +20,18 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import type { BulkActionType, Language } from '@/types/api';
+import { Language, BulkActionType } from '@/types/api';
 import {
   Sparkles,
   RefreshCw,
   Send,
   Trash2,
   Archive,
-  FolderEdit,
   CheckSquare,
   Download,
   Loader2,
   AlertCircle,
 } from 'lucide-react';
-import { useTranslations } from 'next-intl';
 
 interface BulkActionsProps {
   selectedCount: number;
@@ -43,19 +41,19 @@ interface BulkActionsProps {
 }
 
 const BULK_ACTIONS: { value: BulkActionType; label: string; icon: any; color: string; requiresConfirm: boolean }[] = [
-  { value: 'TRANSLATE', label: 'ترجمة', icon: Sparkles, color: 'text-purple-600', requiresConfirm: false },
-  { value: 'UPDATE_TRANSLATIONS', label: 'تحديث الترجمات', icon: RefreshCw, color: 'text-blue-600', requiresConfirm: false },
-  { value: 'PUBLISH', label: 'نشر', icon: Send, color: 'text-green-600', requiresConfirm: false },
-  { value: 'UNPUBLISH', label: 'إلغاء النشر', icon: Archive, color: 'text-orange-600', requiresConfirm: true },
-  { value: 'QUALITY_CHECK', label: 'فحص الجودة', icon: CheckSquare, color: 'text-indigo-600', requiresConfirm: false },
-  { value: 'EXPORT', label: 'تصدير', icon: Download, color: 'text-cyan-600', requiresConfirm: false },
-  { value: 'DELETE', label: 'حذف', icon: Trash2, color: 'text-red-600', requiresConfirm: true },
+  { value: BulkActionType.TRANSLATE, label: 'ترجمة', icon: Sparkles, color: 'text-purple-600', requiresConfirm: false },
+  { value: BulkActionType.UPDATE_TRANSLATIONS, label: 'تحديث الترجمات', icon: RefreshCw, color: 'text-blue-600', requiresConfirm: false },
+  { value: BulkActionType.PUBLISH, label: 'نشر', icon: Send, color: 'text-green-600', requiresConfirm: false },
+  { value: BulkActionType.UNPUBLISH, label: 'إلغاء النشر', icon: Archive, color: 'text-orange-600', requiresConfirm: true },
+  { value: BulkActionType.QUALITY_CHECK, label: 'فحص الجودة', icon: CheckSquare, color: 'text-indigo-600', requiresConfirm: false },
+  { value: BulkActionType.EXPORT, label: 'تصدير', icon: Download, color: 'text-cyan-600', requiresConfirm: false },
+  { value: BulkActionType.DELETE, label: 'حذف', icon: Trash2, color: 'text-red-600', requiresConfirm: true },
 ];
 
 const LANGUAGE_OPTIONS: { value: Language; label: string; flag: string }[] = [
-  { value: 'EN', label: 'English', flag: '🇬🇧' },
-  { value: 'FR', label: 'Français', flag: '🇫🇷' },
-  { value: 'ES', label: 'Español', flag: '🇪🇸' },
+  { value: Language.EN, label: 'English', flag: '🇬🇧' },
+  { value: Language.FR, label: 'Français', flag: '🇫🇷' },
+  { value: Language.ES, label: 'Español', flag: '🇪🇸' },
 ];
 
 export function BulkActions({
@@ -64,7 +62,6 @@ export function BulkActions({
   onClearSelection,
   disabled = false,
 }: BulkActionsProps) {
-  const t = useTranslations();
   const [selectedAction, setSelectedAction] = useState<BulkActionType | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
@@ -77,7 +74,7 @@ export function BulkActions({
     const actionConfig = BULK_ACTIONS.find(a => a.value === action);
 
     // إذا كان الإجراء يحتاج خيارات (مثل الترجمة)
-    if (action === 'TRANSLATE') {
+    if (action === BulkActionType.TRANSLATE) {
       setShowOptions(true);
     }
     // إذا كان الإجراء يحتاج تأكيد
@@ -228,7 +225,7 @@ export function BulkActions({
                 {targetLanguages.length > 0 && (
                   <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-md p-3">
                     <p className="text-sm text-blue-800 dark:text-blue-200">
-                      سيتم إنشاء {selectedCount × targetLanguages.length} ترجمة جديدة
+                      سيتم إنشاء {selectedCount * targetLanguages.length} ترجمة جديدة
                     </p>
                   </div>
                 )}
@@ -238,7 +235,7 @@ export function BulkActions({
           <AlertDialogFooter>
             <AlertDialogCancel disabled={loading}>إلغاء</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => executeAction('TRANSLATE', { targetLanguages })}
+              onClick={() => executeAction(BulkActionType.TRANSLATE, { targetLanguages })}
               disabled={targetLanguages.length === 0 || loading}
             >
               {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
@@ -262,7 +259,7 @@ export function BulkActions({
                   هل أنت متأكد من {selectedActionConfig?.label} {selectedCount} مقالة؟
                 </p>
 
-                {selectedAction === 'DELETE' && (
+                {selectedAction === BulkActionType.DELETE && (
                   <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-md p-3">
                     <p className="text-sm text-red-800 dark:text-red-200 font-semibold">
                       ⚠️ تحذير: هذا الإجراء لا يمكن التراجع عنه
@@ -277,7 +274,7 @@ export function BulkActions({
             <AlertDialogAction
               onClick={() => selectedAction && executeAction(selectedAction)}
               disabled={loading}
-              className={selectedAction === 'DELETE' ? 'bg-destructive hover:bg-destructive/90' : ''}
+              className={selectedAction === BulkActionType.DELETE ? 'bg-destructive hover:bg-destructive/90' : ''}
             >
               {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               تأكيد

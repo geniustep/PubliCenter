@@ -19,21 +19,14 @@ import {
 } from '@/components/ui/popover';
 import type {
   ArticleFilters,
-  ArticleSortBy,
-  TranslationFilterStatus,
-  Language,
-  ArticleStatus,
 } from '@/types/api';
+import { Language, TranslationFilterStatus, ArticleSortBy } from '@/types/api';
 import {
-  Filter,
   X,
   Search,
   SlidersHorizontal,
-  Calendar,
-  Tag,
   CheckCircle2,
 } from 'lucide-react';
-import { useTranslations } from 'next-intl';
 
 interface ArticlesFiltersProps {
   filters: ArticleFilters;
@@ -42,32 +35,30 @@ interface ArticlesFiltersProps {
 }
 
 const LANGUAGE_OPTIONS: { value: Language; label: string; flag: string }[] = [
-  { value: 'AR', label: 'العربية', flag: '🇸🇦' },
-  { value: 'EN', label: 'English', flag: '🇬🇧' },
-  { value: 'FR', label: 'Français', flag: '🇫🇷' },
-  { value: 'ES', label: 'Español', flag: '🇪🇸' },
+  { value: Language.AR, label: 'العربية', flag: '🇸🇦' },
+  { value: Language.EN, label: 'English', flag: '🇬🇧' },
+  { value: Language.FR, label: 'Français', flag: '🇫🇷' },
+  { value: Language.ES, label: 'Español', flag: '🇪🇸' },
 ];
 
 const TRANSLATION_STATUS_OPTIONS: { value: TranslationFilterStatus; label: string; icon: string }[] = [
-  { value: 'ALL', label: 'الكل', icon: '🔄' },
-  { value: 'COMPLETE', label: 'مكتملة', icon: '✅' },
-  { value: 'PARTIAL', label: 'جزئية', icon: '⚠️' },
-  { value: 'MISSING', label: 'مفقودة', icon: '❌' },
-  { value: 'NEEDS_REVIEW', label: 'تحتاج مراجعة', icon: '👁️' },
-  { value: 'OUT_OF_SYNC', label: 'قديمة', icon: '🔄' },
+  { value: TranslationFilterStatus.ALL, label: 'الكل', icon: '🔄' },
+  { value: TranslationFilterStatus.COMPLETE, label: 'مكتملة', icon: '✅' },
+  { value: TranslationFilterStatus.PARTIAL, label: 'جزئية', icon: '⚠️' },
+  { value: TranslationFilterStatus.MISSING, label: 'مفقودة', icon: '❌' },
+  { value: TranslationFilterStatus.NEEDS_REVIEW, label: 'تحتاج مراجعة', icon: '👁️' },
 ];
 
 const SORT_OPTIONS: { value: ArticleSortBy; label: string; icon: string }[] = [
-  { value: 'DATE_DESC', label: 'الأحدث', icon: '📅' },
-  { value: 'DATE_ASC', label: 'الأقدم', icon: '📅' },
-  { value: 'TITLE_AZ', label: 'أبجدياً (أ-ي)', icon: '🔤' },
-  { value: 'VIEWS', label: 'الأكثر مشاهدة', icon: '👁️' },
-  { value: 'QUALITY', label: 'الأعلى جودة', icon: '⭐' },
-  { value: 'TRENDING', label: 'الرائجة', icon: '🔥' },
+  { value: ArticleSortBy.DATE_DESC, label: 'الأحدث', icon: '📅' },
+  { value: ArticleSortBy.DATE_ASC, label: 'الأقدم', icon: '📅' },
+  { value: ArticleSortBy.TITLE_AZ, label: 'أبجدياً (أ-ي)', icon: '🔤' },
+  { value: ArticleSortBy.VIEWS, label: 'الأكثر مشاهدة', icon: '👁️' },
+  { value: ArticleSortBy.QUALITY, label: 'الأعلى جودة', icon: '⭐' },
+  { value: ArticleSortBy.TRENDING, label: 'الرائجة', icon: '🔥' },
 ];
 
 export function ArticlesFilters({ filters, onChange, onReset }: ArticlesFiltersProps) {
-  const t = useTranslations();
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const updateFilter = (key: keyof ArticleFilters, value: any) => {

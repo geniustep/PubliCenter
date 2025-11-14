@@ -94,7 +94,6 @@ export function ArticleCard({
   }) || [];
 
   // إيجاد اللغات المفقودة
-  const existingLanguages = new Set(sortedTranslations.map(t => t.language));
   const missingLanguages = article.translationProgress.missingLanguages;
 
   // تنسيق الوقت

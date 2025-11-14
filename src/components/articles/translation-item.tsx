@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import type { EnhancedTranslation, Language } from '@/types/api';
+import type { EnhancedTranslation } from '@/types/api';
+import { Language } from '@/types/api';
 import {
   Eye,
   Edit,
@@ -14,7 +15,6 @@ import {
   Sparkles,
   FileText,
 } from 'lucide-react';
-import { useTranslations } from 'next-intl';
 
 interface TranslationItemProps {
   translation: EnhancedTranslation;
@@ -25,10 +25,10 @@ interface TranslationItemProps {
 }
 
 const LANGUAGE_FLAGS: Record<Language, string> = {
-  AR: '🇸🇦',
-  EN: '🇬🇧',
-  FR: '🇫🇷',
-  ES: '🇪🇸',
+  [Language.AR]: '🇸🇦',
+  [Language.EN]: '🇬🇧',
+  [Language.FR]: '🇫🇷',
+  [Language.ES]: '🇪🇸',
 };
 
 export function TranslationItem({
@@ -38,7 +38,6 @@ export function TranslationItem({
   onUpdate,
   compact = false,
 }: TranslationItemProps) {
-  const t = useTranslations();
   const [isHovered, setIsHovered] = useState(false);
 
   // حساب اللون بناءً على الحالة

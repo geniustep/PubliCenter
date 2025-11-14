@@ -39,10 +39,17 @@ import { toast } from 'sonner';
 export default function ArticlesPage() {
   const t = useTranslations();
 
+<<<<<<< Updated upstream
   // State Management
   const [filters, setFilters] = useState<ArticleFilters>({
     page: 1,
     limit: 12,
+=======
+  const { data, isLoading, error } = useArticles({
+    page: currentPage,
+    limit: 10,
+    status: statusFilter ? [statusFilter] : undefined,
+>>>>>>> Stashed changes
   });
   const [viewMode, setViewMode] = useState<ArticleViewMode>('GRID' as ArticleViewMode);
   const [selectedArticles, setSelectedArticles] = useState<number[]>([]);

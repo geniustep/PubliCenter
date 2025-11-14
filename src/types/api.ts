@@ -250,14 +250,6 @@ export interface UpdateArticleRequest {
   templateId?: number;
 }
 
-export interface ArticleFilters {
-  page?: number;
-  limit?: number;
-  status?: ArticleStatus;
-  categoryId?: number;
-  authorId?: string;
-  search?: string;
-}
 
 export interface ContactFormRequest {
   name: string;
