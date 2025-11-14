@@ -75,12 +75,12 @@ export default function ArticlesPage() {
   };
 
   const handleSelectAll = () => {
-    if (!data?.articles) return;
+    if (!data?.data) return;
 
-    if (selectedArticles.length === data.articles.length) {
+    if (selectedArticles.length === data.data.length) {
       setSelectedArticles([]);
     } else {
-      setSelectedArticles(data.articles.map((a) => a.id));
+      setSelectedArticles(data.data.map((a) => a.id));
     }
   };
 
@@ -131,9 +131,10 @@ export default function ArticlesPage() {
         ...options,
       });
 
+      const responseData = result.data || result;
       toast.success(
-        `تم تنفيذ الإجراء على ${result.success} مقالة${
-          result.failed > 0 ? ` (فشل ${result.failed})` : ''
+        `تم تنفيذ الإجراء على ${responseData.succeeded || responseData.processed || 0} مقالة${
+          responseData.failed > 0 ? ` (فشل ${responseData.failed})` : ''
         }`
       );
 
@@ -152,7 +153,7 @@ export default function ArticlesPage() {
   // Computed Values
   const isCompact = viewMode === 'COMPACT';
   const isGrid = viewMode === 'GRID';
-  const totalPages = data?.pagination?.totalPages || 1;
+  const totalPages = data?.pagination?.pages || 1;
   const currentPage = filters.page || 1;
 
   return (
@@ -219,20 +220,20 @@ export default function ArticlesPage() {
       />
 
       {/* Select All */}
-      {data && data.articles.length > 0 && (
+      {data && data.data.length > 0 && (
         <div className="flex items-center gap-3 px-2">
           <input
             type="checkbox"
             checked={
-              selectedArticles.length === data.articles.length &&
-              data.articles.length > 0
+              selectedArticles.length === data.data.length &&
+              data.data.length > 0
             }
             onChange={handleSelectAll}
             className="h-4 w-4 rounded border-gray-300"
           />
           <span className="text-sm text-muted-foreground">
             {selectedArticles.length > 0
-              ? `تم تحديد ${selectedArticles.length} من ${data.articles.length}`
+              ? `تم تحديد ${selectedArticles.length} من ${data.data.length}`
               : 'تحديد الكل'}
           </span>
         </div>
@@ -265,7 +266,7 @@ export default function ArticlesPage() {
       )}
 
       {/* Empty State */}
-      {!isLoading && !error && data?.articles.length === 0 && (
+      {!isLoading && !error && data?.data.length === 0 && (
         <Card className="p-12 text-center">
           <Inbox className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
           <h3 className="text-xl font-semibold mb-2">لا توجد مقالات</h3>
@@ -288,7 +289,7 @@ export default function ArticlesPage() {
       )}
 
       {/* Articles Grid/List */}
-      {!isLoading && !error && data && data.articles.length > 0 && (
+      {!isLoading && !error && data && data.data.length > 0 && (
         <div
           className={
             isGrid
@@ -296,7 +297,7 @@ export default function ArticlesPage() {
               : 'space-y-4'
           }
         >
-          {data.articles.map((article) => (
+          {data.data.map((article) => (
             <div key={article.id} className="flex items-start gap-3">
               {/* Selection Checkbox */}
               <input

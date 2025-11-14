@@ -3,12 +3,10 @@ import type {
   ArticleFilters,
   EnhancedArticle,
   EnhancedArticlesResponse,
-  BulkActionType,
   BulkActionRequest,
   BulkActionResponseType,
   TranslationGenerationOptions,
   ArticleImportOptions,
-  Language,
 } from '@/types/api';
 
 /**

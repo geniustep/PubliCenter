@@ -12,7 +12,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { QualityMetrics, QualityBadge } from './quality-metrics';
-import type { EnhancedTranslation, Language } from '@/types/api';
+import type { EnhancedTranslation } from '@/types/api';
+import { Language } from '@/types/api';
 import {
   Eye,
   Edit,
@@ -25,7 +26,6 @@ import {
   Download,
   Share2,
 } from 'lucide-react';
-import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 
 interface TranslationPreviewModalProps {
@@ -37,17 +37,17 @@ interface TranslationPreviewModalProps {
 }
 
 const LANGUAGE_FLAGS: Record<Language, string> = {
-  AR: '🇸🇦',
-  EN: '🇬🇧',
-  FR: '🇫🇷',
-  ES: '🇪🇸',
+  [Language.AR]: '🇸🇦',
+  [Language.EN]: '🇬🇧',
+  [Language.FR]: '🇫🇷',
+  [Language.ES]: '🇪🇸',
 };
 
 const LANGUAGE_NAMES: Record<Language, string> = {
-  AR: 'العربية',
-  EN: 'English',
-  FR: 'Français',
-  ES: 'Español',
+  [Language.AR]: 'العربية',
+  [Language.EN]: 'English',
+  [Language.FR]: 'Français',
+  [Language.ES]: 'Español',
 };
 
 export function TranslationPreviewModal({
@@ -57,7 +57,6 @@ export function TranslationPreviewModal({
   onEdit,
   onPublish,
 }: TranslationPreviewModalProps) {
-  const t = useTranslations();
   const [activeTab, setActiveTab] = useState('preview');
 
   if (!translation) return null;

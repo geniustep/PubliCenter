@@ -15,10 +15,10 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import type { ArticleImportPreview, ArticleImportOptions, Language } from '@/types/api';
+import type { ArticleImportPreview, ArticleImportOptions } from '@/types/api';
+import { Language } from '@/types/api';
 import {
   FileText,
-  Calendar,
   Tag,
   Image as ImageIcon,
   CheckCircle2,
@@ -26,7 +26,6 @@ import {
   Loader2,
   BarChart3,
 } from 'lucide-react';
-import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 
 interface ImportPreviewModalProps {
@@ -38,10 +37,10 @@ interface ImportPreviewModalProps {
 }
 
 const LANGUAGE_FLAGS: Record<Language, string> = {
-  AR: '🇸🇦',
-  EN: '🇬🇧',
-  FR: '🇫🇷',
-  ES: '🇪🇸',
+  [Language.AR]: '🇸🇦',
+  [Language.EN]: '🇬🇧',
+  [Language.FR]: '🇫🇷',
+  [Language.ES]: '🇪🇸',
 };
 
 export function ImportPreviewModal({
@@ -51,7 +50,6 @@ export function ImportPreviewModal({
   onImport,
   wpSiteId,
 }: ImportPreviewModalProps) {
-  const t = useTranslations();
   const [selectedArticles, setSelectedArticles] = useState<number[]>([]);
   const [importOptions, setImportOptions] = useState<Partial<ArticleImportOptions>>({
     includeImages: true,
