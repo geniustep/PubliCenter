@@ -250,7 +250,6 @@ export interface UpdateArticleRequest {
   templateId?: number;
 }
 
-
 export interface ContactFormRequest {
   name: string;
   email: string;
