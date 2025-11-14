@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { asyncHandler } from '@/lib/error-handler';
 import { ArticleStatus } from '@prisma/client';
+import { TranslationStatus } from '@/types/api';
 
 export const dynamic = 'force-dynamic';
 
@@ -123,8 +124,8 @@ export const POST = asyncHandler(async (request: NextRequest) => {
                 title: `${article.title} (${targetLanguage})`,
                 content: article.content,
                 excerpt: article.excerpt,
-                status: 'DRAFT',
-                autoTranslated: true,
+                slug: `${article.id}-${targetLanguage.toLowerCase()}-${Date.now()}`,
+                status: TranslationStatus.PENDING,
               },
             });
 

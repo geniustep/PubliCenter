@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { asyncHandler } from '@/lib/error-handler';
-import { Prisma, ArticleStatus } from '@prisma/client';
+import { Prisma, ArticleStatus, Language } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,16 +20,11 @@ export const GET = asyncHandler(async (request: NextRequest) => {
   // Filters
   const search = searchParams.get('search');
   const sourceLanguage = searchParams.get('sourceLanguage');
-  const translationStatus = searchParams.get('translationStatus');
-  const languages = searchParams.get('languages')?.split(',');
-  const qualityMin = searchParams.get('qualityMin');
-  const qualityMax = searchParams.get('qualityMax');
   const categoryId = searchParams.get('categoryId');
   const templateId = searchParams.get('templateId');
   const authorId = searchParams.get('authorId');
   const dateFrom = searchParams.get('dateFrom');
   const dateTo = searchParams.get('dateTo');
-  const trending = searchParams.get('trending');
   const hasImages = searchParams.get('hasImages');
   const sortBy = searchParams.get('sortBy') || 'DATE_DESC';
   const status = searchParams.get('status')?.split(',') as ArticleStatus[] | undefined;
@@ -53,7 +48,7 @@ export const GET = asyncHandler(async (request: NextRequest) => {
 
   // Source language
   if (sourceLanguage) {
-    where.sourceLanguage = sourceLanguage;
+    where.sourceLanguage = sourceLanguage as Language;
   }
 
   // Category filter
@@ -132,7 +127,7 @@ export const GET = asyncHandler(async (request: NextRequest) => {
           },
         },
         images: {
-          orderBy: { order: 'asc' },
+          orderBy: { createdAt: 'asc' },
           take: 1,
         },
         translations: {
@@ -160,7 +155,7 @@ export const GET = asyncHandler(async (request: NextRequest) => {
   // Transform to EnhancedArticle format
   const enhancedArticles = articles.map((article) => {
     // Calculate translation progress
-    const allLanguages = ['AR', 'EN', 'FR']; // From your Language enum
+    const allLanguages: Language[] = [Language.AR, Language.EN, Language.FR];
     const translatedLanguages = article.translations.map((t) => t.language);
     const missingLanguages = allLanguages.filter(
       (lang) => lang !== article.sourceLanguage && !translatedLanguages.includes(lang)
@@ -202,7 +197,7 @@ export const GET = asyncHandler(async (request: NextRequest) => {
       ...translation,
       needsReview: false,
       hasChanges: false,
-      isAutoTranslated: translation.autoTranslated || false,
+      isAutoTranslated: false, // autoTranslated field removed from schema
       wordCount: translation.content ? translation.content.split(/\s+/).length : 0,
       characterCount: translation.content?.length || 0,
       readingTime: Math.ceil((translation.content?.length || 0) / 1000),
@@ -275,8 +270,8 @@ export const POST = asyncHandler(async (request: NextRequest) => {
       excerpt,
       sourceLanguage,
       status,
-      categoryId: categoryId ? parseInt(categoryId) : null,
-      templateId: templateId ? parseInt(templateId) : null,
+      ...(categoryId && { categoryId: parseInt(categoryId) }),
+      ...(templateId && { templateId: parseInt(templateId) }),
       authorId,
     },
     include: {

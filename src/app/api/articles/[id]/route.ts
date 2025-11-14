@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
  * Get a single article by ID
  */
 export const GET = asyncHandler(
-  async (request: NextRequest, { params }: { params: { id: string } }) => {
+  async (_request: NextRequest, { params }: { params: { id: string } }) => {
     const articleId = parseInt(params.id);
 
     if (isNaN(articleId)) {
@@ -33,7 +33,7 @@ export const GET = asyncHandler(
         category: true,
         template: true,
         images: {
-          orderBy: { order: 'asc' },
+          orderBy: { createdAt: 'asc' },
         },
         translations: {
           include: {
@@ -142,7 +142,7 @@ export const PUT = asyncHandler(
  * Delete an article
  */
 export const DELETE = asyncHandler(
-  async (request: NextRequest, { params }: { params: { id: string } }) => {
+  async (_request: NextRequest, { params }: { params: { id: string } }) => {
     const articleId = parseInt(params.id);
 
     if (isNaN(articleId)) {

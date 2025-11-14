@@ -30,34 +30,7 @@ export function ScheduledItems({
   onDelete,
   onPublishNow,
 }: ScheduledItemsProps) {
-  const getStatusBadge = (item: ScheduledItem) => {
-    if (item.status === 'published') {
-      return (
-        <Badge variant="default" className="bg-green-600">
-          <CheckCircle className="h-3 w-3 mr-1" />
-          منشور
-        </Badge>
-      );
-    }
 
-    if (item.status === 'failed') {
-      return <Badge variant="destructive">فشل</Badge>;
-    }
-
-    if (isPast(item.scheduledAt)) {
-      return <Badge variant="secondary">قيد النشر</Badge>;
-    }
-
-    return <Badge variant="outline">مجدول</Badge>;
-  };
-
-  const getTypeBadge = (type: string) => {
-    return type === 'article' ? (
-      <Badge variant="outline">مقالة</Badge>
-    ) : (
-      <Badge variant="outline">ترجمة</Badge>
-    );
-  };
 
   const sortedItems = [...items].sort(
     (a, b) => a.scheduledAt.getTime() - b.scheduledAt.getTime()
@@ -146,7 +119,7 @@ function ItemCard({
   onPublishNow?: (id: number) => void;
   compact?: boolean;
 }) {
-  const getStatusBadge = () => {
+  const getStatusBadge = (item: ScheduledItem) => {
     if (item.status === 'published') {
       return (
         <Badge variant="default" className="bg-green-600">
@@ -172,7 +145,7 @@ function ItemCard({
       <div className="flex-1 space-y-2">
         <div className="flex items-start justify-between gap-2">
           <h4 className="font-medium text-sm leading-tight line-clamp-2">{item.title}</h4>
-          {getStatusBadge()}
+          {getStatusBadge(item)}
         </div>
 
         <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">

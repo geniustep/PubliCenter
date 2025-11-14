@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { asyncHandler } from '@/lib/error-handler';
-import Anthropic from '@anthropic-ai/sdk';
+import { TranslationStatus } from '@/types/api';
 
 export const dynamic = 'force-dynamic';
 
-// Initialize Anthropic client
-const anthropic = process.env.ANTHROPIC_API_KEY
-  ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
-  : null;
+// Initialize Anthropic client (optional - only if package is installed)
+// Note: @anthropic-ai/sdk is optional. If not installed, AI translation will be disabled.
+// AI translation code is currently commented out until the package is installed
 
 /**
  * POST /api/articles/[id]/translations
@@ -74,9 +73,26 @@ export const POST = asyncHandler(
     let translatedTitle = article.title;
     let translatedContent = article.content || '';
     let translatedExcerpt = article.excerpt || '';
-    let seoMetadata = {};
 
     // Use AI translation if enabled and API key is available
+    // Note: AI translation requires @anthropic-ai/sdk package to be installed
+    if (useAI) {
+      // For now, AI translation is disabled until @anthropic-ai/sdk is installed
+      // TODO: Install @anthropic-ai/sdk and uncomment the AI translation code
+      console.warn('AI translation is currently disabled. Install @anthropic-ai/sdk to enable.');
+    }
+
+    // AI translation code (commented out until package is installed)
+    /*
+    if (useAI && process.env.ANTHROPIC_API_KEY) {
+      try {
+        const Anthropic = (await import('@anthropic-ai/sdk')).default;
+        anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+      } catch (error) {
+        console.warn('@anthropic-ai/sdk not installed, AI translation disabled');
+      }
+    }
+
     if (useAI && anthropic) {
       try {
         const languageNames: Record<string, string> = {
@@ -151,6 +167,7 @@ Format your response as JSON with the following structure:
         // Don't return error, just proceed with non-AI translation
       }
     }
+    */
 
     // Create the translation
     const translation = await prisma.translation.create({
@@ -160,9 +177,8 @@ Format your response as JSON with the following structure:
         title: translatedTitle,
         content: translatedContent,
         excerpt: translatedExcerpt,
-        status: 'DRAFT',
-        autoTranslated: useAI,
-        seoMetadata: Object.keys(seoMetadata).length > 0 ? seoMetadata : undefined,
+        slug: `${articleId}-${targetLanguage.toLowerCase()}-${Date.now()}`,
+        status: TranslationStatus.PENDING,
       },
       include: {
         article: {
@@ -190,7 +206,7 @@ Format your response as JSON with the following structure:
  * Get all translations for an article
  */
 export const GET = asyncHandler(
-  async (request: NextRequest, { params }: { params: { id: string } }) => {
+  async (_request: NextRequest, { params }: { params: { id: string } }) => {
     const articleId = parseInt(params.id);
 
     if (isNaN(articleId)) {
