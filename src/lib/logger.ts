@@ -59,10 +59,28 @@ class Logger {
       console.log(formattedMessage);
     }
 
-    // In production, send to external service (Sentry, LogDNA, etc.)
+    // In production, send to Sentry
     if (process.env.NODE_ENV === 'production' && level === 'error') {
-      // TODO: Send to error tracking service
-      // Example: Sentry.captureException(new Error(message), { extra: context });
+      this.sendToSentry(message, context);
+    }
+  }
+
+  /**
+   * Send error to Sentry
+   */
+  private async sendToSentry(message: string, context?: Record<string, any>): Promise<void> {
+    try {
+      // Dynamic import to avoid bundling Sentry in development
+      const Sentry = await import('@sentry/nextjs');
+
+      const error = new Error(message);
+      Sentry.captureException(error, {
+        extra: context,
+        level: 'error',
+      });
+    } catch (error) {
+      // Silently fail if Sentry is not available
+      console.error('Failed to send error to Sentry:', error);
     }
   }
 

@@ -117,8 +117,108 @@ class MemoryCache {
   }
 }
 
+/**
+ * Unified cache interface that works with both Redis and Memory
+ */
+interface CacheAdapter {
+  get<T>(key: string): Promise<T | null> | T | null;
+  set<T>(key: string, data: T, ttl?: number): Promise<boolean | void> | void;
+  delete(key: string): Promise<boolean | void> | void;
+  has(key: string): Promise<boolean> | boolean;
+  clear(): Promise<void> | void;
+}
+
+/**
+ * Hybrid cache that uses Redis in production and Memory in development
+ */
+class HybridCache implements CacheAdapter {
+  private memoryCache: MemoryCache;
+  private redisCache: any = null; // Will be imported dynamically
+  private useRedis: boolean = false;
+
+  constructor() {
+    this.memoryCache = new MemoryCache();
+    this.initializeRedis();
+  }
+
+  private async initializeRedis() {
+    // Only use Redis in production
+    if (process.env.NODE_ENV === 'production' && process.env.REDIS_URL) {
+      try {
+        const { redis } = await import('./redis');
+        this.redisCache = redis;
+
+        // Check if Redis is connected
+        const isConnected = await redis.ping();
+        if (isConnected) {
+          this.useRedis = true;
+          console.log('✅ Using Redis for caching');
+        } else {
+          console.log('⚠️ Redis not available, using memory cache');
+        }
+      } catch (error) {
+        console.error('Failed to initialize Redis, using memory cache:', error);
+      }
+    } else {
+      console.log('📦 Using in-memory cache (development mode)');
+    }
+  }
+
+  async get<T>(key: string): Promise<T | null> {
+    if (this.useRedis && this.redisCache) {
+      return await this.redisCache.get<T>(key);
+    }
+    return this.memoryCache.get<T>(key);
+  }
+
+  async set<T>(key: string, data: T, ttlMs: number = 300000): Promise<void> {
+    if (this.useRedis && this.redisCache) {
+      const ttlSeconds = Math.ceil(ttlMs / 1000);
+      await this.redisCache.set(key, data, ttlSeconds);
+    } else {
+      this.memoryCache.set(key, data, ttlMs);
+    }
+  }
+
+  async delete(key: string): Promise<void> {
+    if (this.useRedis && this.redisCache) {
+      await this.redisCache.delete(key);
+    } else {
+      this.memoryCache.delete(key);
+    }
+  }
+
+  async has(key: string): Promise<boolean> {
+    if (this.useRedis && this.redisCache) {
+      return await this.redisCache.exists(key);
+    }
+    return this.memoryCache.has(key);
+  }
+
+  async clear(): Promise<void> {
+    if (this.useRedis && this.redisCache) {
+      await this.redisCache.flushAll();
+    } else {
+      this.memoryCache.clear();
+    }
+  }
+
+  // Additional helper methods
+  size(): number {
+    // Only available for memory cache
+    return this.memoryCache.size();
+  }
+
+  destroy(): void {
+    this.memoryCache.destroy();
+    if (this.redisCache) {
+      this.redisCache.disconnect();
+    }
+  }
+}
+
 // Export singleton instance
-export const cache = new MemoryCache();
+export const cache = new HybridCache();
 
 // Export class for testing
-export { MemoryCache };
+export { MemoryCache, HybridCache };
